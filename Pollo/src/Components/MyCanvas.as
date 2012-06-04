@@ -5,16 +5,18 @@
 	import flash.display.Shape;
 	
     import mx.containers.*;
+	
+	import spark.layouts.*;
 
 	public class MyCanvas extends Canvas
 	{
 		public function MyCanvas():void
 		{
-			var child:Canvas = this; //new SpriteVisualElement();
-			top = 280;
-			left = 480;
-			height = 295; 
-			width = 295; 
+			//var child:Canvas = this; //new SpriteVisualElement();
+			right = 0;
+			bottom = 0;
+			height = 195; 
+			width = 195; 
 			setStyle("backgroundColor", 0xff00ff);
 		}
 		

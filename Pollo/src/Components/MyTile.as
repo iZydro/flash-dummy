@@ -1,37 +1,51 @@
 ﻿package Components
 {
     import flash.display.*;
+    import flash.display.Graphics;
+    import flash.display.Shape;
+    import flash.display.Sprite;
     import flash.events.*;
     import flash.geom.*;
-    
     import flash.net.URLRequest;
-	import flash.display.Sprite;
-	import flash.display.Graphics;
-	import flash.display.Shape;
-	
+    
+    import mx.containers.Canvas;
+    import mx.controls.*;
+    
     import spark.components.Application;
     import spark.core.SpriteVisualElement;
-    
-	import mx.containers.Canvas;
-
-    import mx.controls.*;
 
 
 	public class MyTile extends SpriteVisualElement
 	{
         private var url:String = "http://www.isidrogilabert.com/img/isidro.png";
-        
-        private var ptRotationPoint:Point;
-        
+		//private var url:String = "http://www.isidrogilabert.com/img/photos/bit2010.jpg";
+		//private var url:String = "http://www.isidrogilabert.com/img/photos/ronaldo.jpg";
+		//private var url:String = "http://www.isidrogilabert.com/img/photos/newfrontier.jpg";
+		
 		private var dx:int = 1; 
-		private var dy:int = 1; 
+		private var dy:int = 1;
+		
+		private var sx:int = 1; 
+		private var sy:int = 1;
+		
+		private var tx:int = 0;
+		private var ty:int = 0;
         
 		private var state:int = 0;
 		private var count:int = 0;
+		
+		private var isActive:Boolean = false;
+		private var isMoving:Boolean = false;
+		
+		private var loader:Loader;
+		
+		private var localScore:int = 0;
         
         public function MyTile(myURL:String = "")
         {
-            var loader:Loader = new Loader();
+			visible = false;
+			
+            loader = new Loader();
             configureListeners(loader.contentLoaderInfo);
             loader.addEventListener(MouseEvent.MOUSE_DOWN, clickHandler);
 
@@ -46,70 +60,85 @@
 
             addChild(loader);
 
-			var r1 : int = Math.floor( Math.random() * 500 );
-			var r2 : int = Math.floor( Math.random() * 500 );
+			//transform.matrix = new Matrix(1, 0, 0, 1, width>>1, height>>1);
+        }
+
+		public function getScore():int
+		{
+			return localScore;
+		}
+		
+	    public function move():void
+	    {
+			if (!isActive) return;
+
+			if (!isMoving)
+			{
+				initObject();
+				loader.transform.matrix = new Matrix(1, 0, 0, 1, -loader.width>>1, -loader.height>>1);
+				isMoving = true;
+			}
+			
+	    	if (state == 0)
+	    	{
+				if (tx-- <= 0)
+				{
+					tx = Math.random() * 10 + 10;
+					dx = Math.random() * 4;
+				}
+
+				if (ty-- <= 0)
+				{
+					ty = Math.random() * 10 + 10;
+					dy = Math.random() * 4;
+				}
+
+				var oldtop:Object  = top;
+				var oldleft:Object = left;
+				
+		        top  = top  + 2*sy+dy*sy;
+		        left = left + 2*sx+dx*sx;
+		        
+		        if ( left < (loader.width>>1)  )                   { sx = 1;  left = oldleft; }
+		        if ( top  < (loader.height>>1) )                   { sy = 1;  top  = oldtop;  }
+		        if ( left > (parent.width - (loader.width>>1)) )   { sx = -1; left = oldleft; }
+		        if ( top  > (parent.height - (loader.height>>1)) ) { sy = -1; top  = oldtop;  }
+
+			}
+	    	
+	    	if (state == 1)
+	    	{
+	    		count += 10;
+				
+	    		rotation = count;
+	    		scaleX = 1 - (count % 360) / 360;
+				scaleY = 1 - (count % 360) / 360;
+	    		if (count >= 360)
+	    		{
+					initObject();
+					localScore += 1;
+	    		}
+	    	}
+	    }
+
+		private function initObject():void
+		{
+			var r1 : int = Math.floor( Math.random() * (parent.height - loader.height) + (loader.height>>1) );
+			var r2 : int = Math.floor( Math.random() * (parent.width - loader.width)   + (loader.width>>1)  );
 			top = r1;
 			left = r2;
 			
 			state = 0;
 			count = 0;
 			
-			//transform.matrix = new Matrix(1, 0, 0, 1, width>>1, height>>1);
-        }
+			rotation = 0;
+			scaleX = 1;
+			scaleY = 1;
+			
+			visible = true;
 
-	    public function move():void
-	    {
-	    	if (state == 0)
-	    	{
-		        top = top + 4*dy;
-		        left = left + 4*dx;
-		        
-		        if (left < 0) dx = 1;
-		        if (top < 0) dy = 1;
-		        if (left > 800) dx = -1;
-		        if (top > 500) dy = -1;
-	    	}
-	    	
-	    	if (state == 1)
-	    	{
-	    		count += 10;
-	    		//scaleX = 1 + (count % 10) / 10;
-	    		//scaleY = 1 + (count % 10) / 10;
-
-	    		//rotation = count;
-	    		//scaleX = 1 + (count % 50) / 50;
-	    		//ptRotationPoint = new Point(top + width/2, left + height/2);
-	    		//scaleFromCenter(this, 1.01, 1.01, ptRotationPoint);
-	    		
-	    		if (count == 10)
-	    		{
-	    			 var clip:Sprite = this;
-					 var tx:Number = clip.x;
-					 var ty:Number = clip.y;
-					 var m:Matrix = clip.transform.matrix;
-					 m.translate( -tx, -ty );
-					 m.rotate(45*Math.PI/180);
-					 m.translate( tx, ty );
-					 //m.scale( 2, 2);
-					 clip.transform.matrix = m;
-	    		}
-	    			    			    		
-	    		if (count >= 360)
-	    		{
-					var r1 : int = Math.floor( Math.random() * 500 );
-					var r2 : int = Math.floor( Math.random() * 500 );
-					top = r1;
-					left = r2;
-	    			state = 0;
-	    			count = 0;
-	    			rotation = 0;
-	    			scaleX = 1;
-	    			scaleY = 1;
-		    		//scaleFromCenter(this, 1, 1, ptRotationPoint);
-	    		}
-	    	}
-	    }
-
+		}
+		
         private function configureListeners(dispatcher:IEventDispatcher):void
         {
             dispatcher.addEventListener(Event.COMPLETE, completeHandler);
@@ -124,7 +153,7 @@
         private function completeHandler(event:Event):void {
             trace("completeHandler: " + event);
 
-    		ptRotationPoint = new Point(x + width/2, y + height/2);
+			isActive = true;
             
             //Alert.show("Loaded!");
         }
@@ -163,13 +192,6 @@
             	// Estaba vivo
             	state = 1;
             }
-            /*else
-            {
-	            var r1 : int = Math.floor( Math.random() * 500 );
-				var r2 : int = Math.floor( Math.random() * 500 );
-				top = r1;
-				left = r2;
-            }*/
         }
         
 		private static function rotateImage(image:Sprite, degrees:Number):void

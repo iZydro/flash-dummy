@@ -1,10 +1,10 @@
 ﻿package Components
 {
-	import flash.display.Sprite;
 	import flash.display.Graphics;
 	import flash.display.Shape;
+	import flash.display.Sprite;
 	
-    import spark.components.*;
+	import spark.components.*;
 
 	public class MyPanel extends Panel
 	{
@@ -22,6 +22,11 @@
 			setStyle("paddingRight",10); 
 			setStyle("paddingBottom", 10); 
 			
+		}
+		
+		public function setTitle(_title:String):void
+		{
+			title = _title;
 		}
 		
 	}
