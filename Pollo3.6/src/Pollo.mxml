@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" creationComplete="initApp()">
+<mx:Canvas id="mainpanel" width="800" height="600">
+	
+	<mx:Script>
+		<![CDATA[
+			public function initApp():void 
+			{
+				// says hello at the start, and asks for the user's name
+				var app:MyApplication;
+				app = new MyApplication();
+				mainpanel.addChild(app.done());
+				
+			}
+		]]>
+	</mx:Script>
+	
+</mx:Canvas>
+	
+</mx:Application>
