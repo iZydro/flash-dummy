@@ -34,7 +34,7 @@
 		private var state:int = 0;
 		private var count:int = 0;
 		
-		private var isActive:Boolean = false;
+		public var isActive:Boolean = false;
 		private var isMoving:Boolean = false;
 		
 		private var loader:Loader;
@@ -68,15 +68,29 @@
 			return localScore;
 		}
 		
-	    public function move():void
+	    public function move(elapsed:int):Bitmap
 	    {
-			if (!isActive) return;
+			if (!isActive) return null;
 
 			if (!isMoving)
 			{
 				initObject();
 				loader.transform.matrix = new Matrix(1, 0, 0, 1, -loader.width>>1, -loader.height>>1);
 				isMoving = true;
+				
+				import flash.display.BitmapData;
+				import flash.display.Bitmap;
+				var bd2:BitmapData=new BitmapData(160,200,true,0xFF00FFFF);
+				var mat:Matrix=new Matrix();
+				//mat.rotate(-45);
+				//mat.scale(0.6,0.6);
+				mat.translate(width>>1,height>>1);
+				bd2.draw(this,mat);
+				//bd2.draw(this);
+				var bitmap2:Bitmap=new Bitmap(bd2);
+				bitmap2.x=70;
+				bitmap2.y=160;
+				return bitmap2;
 			}
 			
 	    	if (state == 0)
@@ -84,21 +98,24 @@
 				if (tx-- <= 0)
 				{
 					tx = Math.random() * 10 + 10;
-					dx = Math.random() * 4;
+					dx = Math.random() * 4 + 2;
 				}
 
 				if (ty-- <= 0)
 				{
 					ty = Math.random() * 10 + 10;
-					dy = Math.random() * 4;
+					dy = Math.random() * 4 + 2;
 				}
 
 				var oldtop:int  = y;
 				var oldleft:int = x;
 				
-		        y = y + 2*sy+dy*sy;
-		        x = x + 2*sx+dx*sx;
+		        y = y + dy*sy*50 * (elapsed/1000);
+		        x = x + dx*sx*50 * (elapsed/1000);
 		        
+				//y = y + 0*sy * (elapsed/1000);
+				//x = x + 200*sy * (elapsed/1000);
+				
 		        if ( x < (loader.width>>1)  )                   { sx = 1;  x = oldleft; }
 		        if ( y < (loader.height>>1) )                   { sy = 1;  y = oldtop;  }
 		        if ( x > (parent.width - (loader.width>>1)) )   { sx = -1; x = oldleft; }
@@ -119,6 +136,8 @@
 					localScore += 1;
 	    		}
 	    	}
+			
+			return null;
 	    }
 
 		private function initObject():void
@@ -154,7 +173,7 @@
             trace("completeHandler: " + event);
 
 			isActive = true;
-            
+			
             //Alert.show("Loaded!");
         }
 

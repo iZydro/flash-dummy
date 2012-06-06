@@ -1,22 +1,23 @@
 ﻿package  /*Components*/
 {
+    import flash.display.Bitmap;
     import flash.display.Graphics;
     import flash.display.Loader;
     import flash.display.Shape;
     import flash.display.Sprite;
     import flash.events.*;
     import flash.events.TimerEvent;
+    import flash.geom.*;
     import flash.net.*;
+    import flash.utils.*;
     import flash.utils.Timer;
-	
-	import flash.geom.*;
     
     import mx.containers.Canvas;
+    import mx.controls.*;
     import mx.controls.Alert;
     import mx.events.FlexEvent;
     import mx.graphics.SolidColor;
 
-	import mx.controls.*;
 /*    
     import spark.components.*;
     import spark.components.Application;
@@ -43,8 +44,10 @@
     	private var tile2:MyTile;
     	
 		private var timer:Timer = null;
+		private var elapsedTimer:int;
+		private var currentTimer:int;
 		
-		public static const DELAY:Number = 1;
+		public static const DELAY:Number = 1000 / 30;
 		
 		private static var myScore:int = 0;
 
@@ -67,36 +70,16 @@
 			panel = new MyPanel(); 
 			this.addChild(panel);
 
-/*			
-			var sp:SpriteVisualElement = new SpriteVisualElement();
-			sp.left = 50;
-			sp.top = 50;
-			this.addElement(sp);
-			sp.graphics.beginFill(0xffff00,1);
-			sp.graphics.drawRoundRect(10,10,100,100,150,150);
-			sp.graphics.endFill();
-
-			//var canvas:Components.MyCanvas = new Components.MyCanvas();
-*/
-/*			
-			var group:Group = new Group();
-			group.width = 400;
-			group.height = 400;
-			group.x = 0;
-			group.y = 0;
-*/
 			var bg:Canvas = new Canvas();
-			bg.x = 0;
-			bg.y = 0;
-			bg.height = 195; 
-			bg.width = 195; 
+			bg.x = 80;
+			bg.y = 80;
+			bg.width = 395; 
+			bg.height = 295; 
 			bg.setStyle("backgroundColor", 0xff00ff);
 			panel.rawChildren.addChild(bg);
 			
-//			group.addElement(bg);
-			
-			//var shape:MyShape = new MyShape(); 
-			//this.addElement(shape);
+			var shape:MyShape = new MyShape(); 
+			panel.rawChildren.addChild(shape);
 			
 			//group.addElement(shape);
 			
@@ -107,17 +90,20 @@
 			
 			tile = new MyTile(); 
 			canvas.rawChildren.addChild(tile);
-
-			tile1 = new MyTile("http://www.isidrogilabert.com/img/vttennis.png"); 
+			
+			tile1 = new MyTile("http://www.isidrogilabert.com/flash/tile.png"); 
 			panel.rawChildren.addChild(tile1);
 
 			tile2 = new MyTile("http://www.isidrogilabert.com/img/yummy.png"); 
 			panel.rawChildren.addChild(tile2);
 
-/*			
-			group.addElement(tile2);
-*/
-			
+			var sp:Sprite = new Sprite();
+			sp.x = 50;
+			sp.y = 50;
+			sp.graphics.beginFill(0xffff00,1);
+			sp.graphics.drawRoundRect(10,10,100,100,150,150);
+			sp.graphics.endFill();
+			panel.rawChildren.addChild(sp);
 			
 /*			
 			myLoader = new Loader();
@@ -127,6 +113,8 @@
 			//var fileRequest:URLRequest = new URLRequest("http://www.isidrogilabert.com/img/isidro.png");
 			//myLoader.load(fileRequest);
 */
+			currentTimer = getTimer();
+
 	        timer = new Timer(DELAY);
 	        timer.addEventListener(TimerEvent.TIMER, onTimerTick);
 			timer.start();
@@ -137,13 +125,21 @@
 	    private function onTimerTick(event:TimerEvent):void
 	    {
 	    	//Alert.show("Timer!");
+			var now:int = getTimer();
+			elapsedTimer = now - currentTimer;
+			currentTimer = now;
 			if (isActive)
 			{
-		    	tile.move();
-		    	tile1.move();
-		    	tile2.move();
+				var caca:Bitmap;
+				caca = tile.move(elapsedTimer);
+		    	if (caca != null)
+				{
+					canvas.rawChildren.addChild(caca);
+				}
+		    	tile1.move(elapsedTimer);
+		    	tile2.move(elapsedTimer);
 				
-				panel.setTitle("Papás:" + tile.getScore() + " Tenis: "+ tile1.getScore() + " Yummy: " + tile2.getScore());
+				panel.setTitle("Papás:" + tile.getScore() + " Tenis: "+ tile1.getScore() + " Yummy: " + tile2.getScore() + " Elapsed: " + elapsedTimer);
 			}
 	    	
 	    }

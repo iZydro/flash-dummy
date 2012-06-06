@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" creationComplete="initApp()">
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" creationComplete="initApp()" frameRate="30">
 <mx:Canvas id="mainpanel" width="800" height="600">
-	
 	<mx:Script>
 		<![CDATA[
 			public function initApp():void 
@@ -15,7 +13,5 @@
 			}
 		]]>
 	</mx:Script>
-	
 </mx:Canvas>
-	
 </mx:Application>

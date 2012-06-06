@@ -13,10 +13,10 @@
 		public function MyCanvas():void
 		{
 			//var child:Canvas = this; //new SpriteVisualElement();
-			x = 110;
-			y = 110;
-			height = 195; 
-			width = 195; 
+			x = 270;
+			y = 170;
+			width = 395; 
+			height = 295; 
 			setStyle("backgroundColor", 0x0000ff);
 		}
 		
