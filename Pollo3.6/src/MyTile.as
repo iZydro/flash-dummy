@@ -80,16 +80,22 @@
 				
 				import flash.display.BitmapData;
 				import flash.display.Bitmap;
-				var bd2:BitmapData=new BitmapData(160,200,true,0xFF00FFFF);
+				var bd2:BitmapData=new BitmapData(width>>1,height>>1,true,0xFF00FFFF);
 				var mat:Matrix=new Matrix();
 				//mat.rotate(-45);
 				//mat.scale(0.6,0.6);
 				mat.translate(width>>1,height>>1);
 				bd2.draw(this,mat);
-				//bd2.draw(this);
+
+				bd2.setPixel(0, 0, 0xffffff);
+				bd2.setPixel(16, 16, 0xff0000);
+				
 				var bitmap2:Bitmap=new Bitmap(bd2);
-				bitmap2.x=70;
-				bitmap2.y=160;
+				bitmap2.x=-width>>1;
+				bitmap2.y=-height>>1;
+				
+				addChild(bitmap2);
+				
 				return bitmap2;
 			}
 			
