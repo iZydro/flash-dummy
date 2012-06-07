@@ -85,6 +85,22 @@
 			
 			//panel.addElement(group);
 			
+			var image:Image = new Image();
+			image.source = "youtube.png";
+			image.x = 0;
+			image.y = 0;
+			
+			var imgContainer:Sprite = new Sprite();
+			imgContainer.graphics.beginFill(0xff0000);
+			imgContainer.graphics.drawRoundRect(0, 0, 100, 100, 20);
+			imgContainer.graphics.endFill();
+			imgContainer.x = 200;
+			imgContainer.y = 200;
+			
+			//imgContainer.addChild(image);
+			
+			panel.rawChildren.addChild(imgContainer);
+			
 			canvas = new MyCanvas();
 			panel.rawChildren.addChild(canvas);
 			
