@@ -11,7 +11,10 @@
     import mx.containers.Canvas;
     import mx.controls.*;
     
-    //import spark.components.Application;
+	import flash.display.BitmapData;
+	import flash.display.Bitmap;
+
+	//import spark.components.Application;
     //import spark.core.SpriteVisualElement;
 
 
@@ -21,6 +24,10 @@
 		//private var url:String = "http://www.isidrogilabert.com/img/photos/bit2010.jpg";
 		//private var url:String = "http://www.isidrogilabert.com/img/photos/ronaldo.jpg";
 		//private var url:String = "http://www.isidrogilabert.com/img/photos/newfrontier.jpg";
+
+		private var bd2:BitmapData; // Working bitmapdata
+		private var bitmap2:Bitmap; // Working bitmap
+		private var bm:MyBitmap;
 		
 		private var dx:int = 1; 
 		private var dy:int = 1;
@@ -48,6 +55,7 @@
             loader = new Loader();
             configureListeners(loader.contentLoaderInfo);
             loader.addEventListener(MouseEvent.MOUSE_DOWN, clickHandler);
+			//loader.addEventListener(MouseEvent.MOUSE_OVER, clickHandler);
 
             var request:URLRequest = new URLRequest(url);
 			
@@ -78,9 +86,12 @@
 				loader.transform.matrix = new Matrix(1, 0, 0, 1, -loader.width>>1, -loader.height>>1);
 				isMoving = true;
 				
+				bm = new MyBitmap();
+				bitmap2 = bm.getBitmap(loader.width, loader.height, this);
+/*				
 				import flash.display.BitmapData;
 				import flash.display.Bitmap;
-				var bd2:BitmapData=new BitmapData(width>>1,height>>1,true,0xFF00FFFF);
+				bd2 = new BitmapData(width>>1,height>>1,true,0xFF00FFFF);
 				var mat:Matrix=new Matrix();
 				//mat.rotate(-45);
 				//mat.scale(0.6,0.6);
@@ -90,10 +101,10 @@
 				bd2.setPixel(0, 0, 0xffffff);
 				bd2.setPixel(16, 16, 0xff0000);
 				
-				var bitmap2:Bitmap=new Bitmap(bd2);
+				bitmap2 = new Bitmap(bd2);
 				bitmap2.x=-width>>1;
 				bitmap2.y=-height>>1;
-				
+*/				
 				addChild(bitmap2);
 				
 				return bitmap2;
@@ -216,49 +227,15 @@
             {
             	// Estaba vivo
             	state = 1;
+				
+				//bd2.setPixel(bitmap2.scaleX*10, bitmap2.scaleX*10, 0x00ff00);
+				
+				//bitmap2.scaleX += 0.1;
+				//bitmap2.scaleY += 0.1;
+				
+				
             }
         }
-        
-		private static function rotateImage(image:Sprite, degrees:Number):void
-		{
-			// Calculate rotation and offsets
-			var radians:Number = degrees * (Math.PI / 180.0);
-			var offsetWidth:Number = image.width/2;//contentWidth/2.0;
-			var offsetHeight:Number =  image.height/2;//contentHeight/2.0;
-		
-			// Perform rotation
-			var matrix:Matrix = new Matrix();
-			matrix.translate(-offsetWidth, -offsetHeight);
-			matrix.rotate(radians);
-			matrix.translate(+offsetWidth, +offsetHeight);
-			matrix.concat(image.transform.matrix);
-			image.transform.matrix = matrix;
-		}        
-		
-		private function scaleFromCenter(ob:*, sx:Number, sy:Number, ptScalePoint:Point):void
-		{ 
-			var m:Matrix=ob.transform.matrix;
-			m.tx -= ptScalePoint.x;
-			m.ty -= ptScalePoint.y;
-			m.scale(sx, sy);
-			m.tx += ptScalePoint.x;
-			m.ty += ptScalePoint.y;
-			ob.transform.matrix = m;
-		}
-		
-		public static function scaleAroundPoint(objToScale:DisplayObject, regX:int, regY:int, scaleX:Number, scaleY:Number):void
-		{
-            if (!objToScale)
-            {
-                return;
-            }
-            
-            var transformedVector:Point = new Point( (regX-objToScale.x)*scaleX, (regY-objToScale.y)*scaleY );
-            
-            objToScale.x = regX-( transformedVector.x);
-            objToScale.y = regY-( transformedVector.y);
-            objToScale.scaleX =  objToScale.scaleX*(scaleX);
-            objToScale.scaleY =  objToScale.scaleY*(scaleY);
-		}		
-    }
+      
+   }
 }
