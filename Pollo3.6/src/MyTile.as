@@ -1,6 +1,8 @@
 ﻿package 
 {
     import flash.display.*;
+    import flash.display.Bitmap;
+    import flash.display.BitmapData;
     import flash.display.Graphics;
     import flash.display.Shape;
     import flash.display.Sprite;
@@ -10,15 +12,8 @@
     
     import mx.containers.Canvas;
     import mx.controls.*;
-    
-	import flash.display.BitmapData;
-	import flash.display.Bitmap;
 
-	//import spark.components.Application;
-    //import spark.core.SpriteVisualElement;
-
-
-	public class MyTile extends Sprite/*VisualElement*/
+	public class MyTile /*extends Sprite*/
 	{
         private var url:String = "http://www.isidrogilabert.com/img/isidro.png";
 		//private var url:String = "http://www.isidrogilabert.com/img/photos/bit2010.jpg";
@@ -44,13 +39,24 @@
 		public var isActive:Boolean = false;
 		private var isMoving:Boolean = false;
 		
-		private var loader:Loader;
+		private var loader:Loader = null;
+		private var sprite:Sprite = null;
+		
+		private var theHeight:int = 0;
+		private var theWidth:int = 0;
 		
 		private var localScore:int = 0;
         
-        public function MyTile(myURL:String = "")
+		public var tile:Sprite;
+		
+		public function MyTile()
+		{
+			tile = new Sprite();
+		}
+		
+        public function createFromURL(myURL:String = ""):void
         {
-			visible = false;
+			tile.visible = false;
 			
             loader = new Loader();
             configureListeners(loader.contentLoaderInfo);
@@ -66,10 +72,20 @@
 			
             loader.load(request);
 
-            addChild(loader);
+            tile.addChild(loader);
 
 			//transform.matrix = new Matrix(1, 0, 0, 1, width>>1, height>>1);
         }
+		
+		public function createFromSprite(sprite_id:Sprite):void
+		{
+			sprite = sprite_id;
+			sprite.addEventListener(MouseEvent.MOUSE_DOWN, clickHandler);
+			theHeight = sprite.height;
+			theWidth  = sprite.width;
+			tile.addChild(sprite);
+			isActive = true;
+		}
 
 		public function getScore():int
 		{
@@ -83,29 +99,15 @@
 			if (!isMoving)
 			{
 				initObject();
-				loader.transform.matrix = new Matrix(1, 0, 0, 1, -loader.width>>1, -loader.height>>1);
+				
+				if (loader) loader.transform.matrix = new Matrix(1, 0, 0, 1, -theWidth>>1, -theHeight>>1);
+				//if (sprite) sprite.transform.matrix = new Matrix(1, 0, 0, 1, -theWidth>>1, -theHeight>>1);
+				
 				isMoving = true;
 				
-				bm = new MyBitmap();
-				bitmap2 = bm.getBitmap(loader.width, loader.height, this);
-/*				
-				import flash.display.BitmapData;
-				import flash.display.Bitmap;
-				bd2 = new BitmapData(width>>1,height>>1,true,0xFF00FFFF);
-				var mat:Matrix=new Matrix();
-				//mat.rotate(-45);
-				//mat.scale(0.6,0.6);
-				mat.translate(width>>1,height>>1);
-				bd2.draw(this,mat);
-
-				bd2.setPixel(0, 0, 0xffffff);
-				bd2.setPixel(16, 16, 0xff0000);
-				
-				bitmap2 = new Bitmap(bd2);
-				bitmap2.x=-width>>1;
-				bitmap2.y=-height>>1;
-*/				
-				addChild(bitmap2);
+				//bm = new MyBitmap();
+				//bitmap2 = bm.getBitmap(theWidth, theHeight, tile);
+				//tile.addChild(bitmap2);
 				
 				return bitmap2;
 			}
@@ -124,19 +126,19 @@
 					dy = Math.random() * 4 + 2;
 				}
 
-				var oldtop:int  = y;
-				var oldleft:int = x;
+				var oldtop:int  = tile.y;
+				var oldleft:int = tile.x;
 				
-		        y = y + dy*sy*50 * (elapsed/1000);
-		        x = x + dx*sx*50 * (elapsed/1000);
+				tile.y = tile.y + dy*sy*50 * (elapsed/1000);
+				tile.x = tile.x + dx*sx*50 * (elapsed/1000);
 		        
 				//y = y + 0*sy * (elapsed/1000);
 				//x = x + 200*sy * (elapsed/1000);
 				
-		        if ( x < (loader.width>>1)  )                   { sx = 1;  x = oldleft; }
-		        if ( y < (loader.height>>1) )                   { sy = 1;  y = oldtop;  }
-		        if ( x > (parent.width - (loader.width>>1)) )   { sx = -1; x = oldleft; }
-		        if ( y > (parent.height - (loader.height>>1)) ) { sy = -1; y = oldtop;  }
+		        if ( tile.x < (theWidth>>1)  )                   { sx = 1;  tile.x = oldleft; }
+		        if ( tile.y < (theHeight>>1) )                   { sy = 1;  tile.y = oldtop;  }
+		        if ( tile.x > (tile.parent.width - (theWidth>>1)) )   { sx = -1; tile.x = oldleft; }
+		        if ( tile.y > (tile.parent.height - (theHeight>>1)) ) { sy = -1; tile.y = oldtop;  }
 
 			}
 	    	
@@ -144,13 +146,21 @@
 	    	{
 	    		count += 10;
 				
-	    		rotation = count;
-	    		scaleX = 1 - (count % 360) / 360;
-				scaleY = 1 - (count % 360) / 360;
+				tile.rotation = count;
+				tile.scaleX = 1 - (count % 360) / 360;
+				tile.scaleY = 1 - (count % 360) / 360;
 	    		if (count >= 360)
 	    		{
-					initObject();
-					localScore += 1;
+					if (loader)
+					{
+						initObject();
+						localScore += 1;
+					}
+					else
+					{
+						isActive = false;
+						sprite.visible = false;
+					}
 	    		}
 	    	}
 			
@@ -159,19 +169,19 @@
 
 		private function initObject():void
 		{
-			var r1 : int = Math.floor( Math.random() * (parent.height - loader.height) + (loader.height>>1) );
-			var r2 : int = Math.floor( Math.random() * (parent.width - loader.width)   + (loader.width>>1)  );
-			y = r1;
-			x = r2;
+			var r1 : int = Math.floor( Math.random() * (tile.parent.height - theHeight) + (theHeight>>1) );
+			var r2 : int = Math.floor( Math.random() * (tile.parent.width - theWidth)   + (theWidth>>1)  );
+			tile.y = r1;
+			tile.x = r2;
 			
 			state = 0;
 			count = 0;
 			
-			rotation = 0;
-			scaleX = 1;
-			scaleY = 1;
+			tile.rotation = 0;
+			tile.scaleX = 1;
+			tile.scaleY = 1;
 			
-			visible = true;
+			tile.visible = true;
 
 		}
 		
@@ -189,6 +199,8 @@
         private function completeHandler(event:Event):void {
             trace("completeHandler: " + event);
 
+			theHeight = loader.height;
+			theWidth = loader.width;
 			isActive = true;
 			
             //Alert.show("Loaded!");
@@ -227,13 +239,6 @@
             {
             	// Estaba vivo
             	state = 1;
-				
-				//bd2.setPixel(bitmap2.scaleX*10, bitmap2.scaleX*10, 0x00ff00);
-				
-				//bitmap2.scaleX += 0.1;
-				//bitmap2.scaleY += 0.1;
-				
-				
             }
         }
       

@@ -49,6 +49,8 @@
 		private var bs0:Sprite;
 		private var bs1:Sprite;
 		
+		private var tiles:Array = new Array;
+		
 		private var bsBase:MyBaseSprite;
 		
 		public function done():Canvas
@@ -101,14 +103,17 @@
 			canvas = new MyCanvas();
 			panel.rawChildren.addChild(canvas);
 			
-			tile = new MyTile(); 
-			canvas.rawChildren.addChild(tile);
+			tile = new MyTile();
+			tile.createFromURL("");
+			canvas.rawChildren.addChild(tile.tile);
 			
-			tile1 = new MyTile("http://www.isidrogilabert.com/flash/tile.png"); 
-			panel.rawChildren.addChild(tile1);
+			tile1 = new MyTile();
+			tile1.createFromURL("http://www.isidrogilabert.com/flash/tile.png"); 
+			panel.rawChildren.addChild(tile1.tile);
 
-			tile2 = new MyTile("http://www.isidrogilabert.com/img/yummy.png"); 
-			panel.rawChildren.addChild(tile2);
+			tile2 = new MyTile();
+			tile2.createFromURL("http://www.isidrogilabert.com/img/yummy.png"); 
+			panel.rawChildren.addChild(tile2.tile);
 			
 			//bs1 = new MyBaseSprite(80, 80/*"http://www.isidrogilabert.com/img/vttennis.png"*/);
 			bs0 = new Sprite();
@@ -169,6 +174,7 @@
 				bs1.y = 300;
 				panel.rawChildren.addChild(bs1);
 				
+				
 				// Clone old bitmap data
 				var mybmd2:BitmapData = mybmd.clone();
 
@@ -180,23 +186,46 @@
 				var bm1:Bitmap = new Bitmap(mybmd2);
 				
 				bm1.rotation = 0;
-				bm1.x = -mybmd2.width>>1;
-				bm1.y = -mybmd2.height>>1;
+				bm1.x = 0;
+				bm1.y = 0;
+				bm1.transform.matrix = new Matrix(1, 0, 0, 1, -bm1.width>>1, -bm1.height>>1);
 
 				// And add it to the Sprite holder
 				bs0.addChild(bm1);
-				
 				bs0.x = 0;
 				bs0.y = 0;
+				//bs0.transform.matrix = new Matrix(1, 0, 0, 1, -mybmd2.width>>1, -mybmd2.height>>1);
+
 				panel.rawChildren.addChild(bs0);
 				
-				//bs1.onceLoaded = false;
+				for (var i:int = 0; i < 20; i++)
+				{
+					var _sp:Sprite = new Sprite();
+					var _bm:Bitmap = new Bitmap(mybmd2);
+					_bm.transform.matrix = new Matrix(1, 0, 0, 1, -_bm.width>>1, -_bm.height>>1);
+					_sp.addChild(_bm);
+					_sp.x = 0;//i*30;
+					_sp.y = 0;//i*25;
+					_sp.rotation = (i*18) % 360;
+					
+					var mt:MyTile = new MyTile();
+					mt.createFromSprite(_sp);
+					panel.rawChildren.addChild(mt.tile);
+					
+					//panel.rawChildren.addChild(_sp);
+					
+					tiles.push(mt);
+				}
+				
 				bsBase.onceLoaded = false;
 			}
 			
 			
 			if (isActive)
 			{
+				bs0.rotation += 10;
+				bs0.rotation %= 360;
+				
 				var caca:Bitmap;
 				caca = tile.move(elapsedTimer);
 		    	if (caca != null)
@@ -208,6 +237,15 @@
 				
 				
 		    	tile2.move(elapsedTimer);
+				
+				
+				for(var cnt:int = 0; cnt < tiles.length; cnt++)
+				{
+					//trace(i+". Posicion: "+nombrearray[i]);
+					tiles[cnt].move(elapsedTimer);
+				}
+				
+				
 				
 				panel.setTitle("Papás:" + tile.getScore() + " Tenis: "+ tile1.getScore() + " Yummy: " + tile2.getScore() + " Elapsed: " + elapsedTimer);
 			}
