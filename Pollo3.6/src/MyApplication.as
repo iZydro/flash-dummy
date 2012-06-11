@@ -1,6 +1,7 @@
 ﻿package  /*Components*/
 {
     import flash.display.Bitmap;
+    import flash.display.BitmapData;
     import flash.display.Graphics;
     import flash.display.Loader;
     import flash.display.Shape;
@@ -15,23 +16,15 @@
     import mx.containers.Canvas;
     import mx.controls.*;
     import mx.controls.Alert;
+    import mx.events.DragEvent;
     import mx.events.FlexEvent;
     import mx.graphics.SolidColor;
 
-/*    
-    import spark.components.*;
-    import spark.components.Application;
-    import spark.components.Button;
-    import spark.core.*;
-    import spark.layouts.*;
-    import spark.primitives.Rect;
-*/
-
-    public class MyApplication extends Canvas
+	//[SWF(width = "1024", height = "768")]
+	public class MyApplication extends Canvas
     {
 		private var isActive:Boolean = false;
 
-    	//private static var app:Application;
 		private static var myLoader:Loader;
 		private static var canvas:MyCanvas;
 		
@@ -50,7 +43,14 @@
 		public static const DELAY:Number = 1000 / 30;
 		
 		private static var myScore:int = 0;
-
+		
+		//private var bs1:MyBaseSprite;
+		
+		private var bs0:Sprite;
+		private var bs1:Sprite;
+		
+		private var bsBase:MyBaseSprite;
+		
 		public function done():Canvas
 		{
 			return this;
@@ -66,8 +66,9 @@
 			//createMainPanel();
 			//addChild(MyApplication.mainPanel)
 
-			
-			panel = new MyPanel(); 
+			x=0;
+			y=0;
+			panel = new MyPanel();
 			this.addChild(panel);
 
 			var bg:Canvas = new Canvas();
@@ -80,10 +81,6 @@
 			
 			var shape:MyShape = new MyShape(); 
 			panel.rawChildren.addChild(shape);
-			
-			//group.addElement(shape);
-			
-			//panel.addElement(group);
 			
 			var image:Image = new Image();
 			image.source = "youtube.png";
@@ -112,6 +109,12 @@
 
 			tile2 = new MyTile("http://www.isidrogilabert.com/img/yummy.png"); 
 			panel.rawChildren.addChild(tile2);
+			
+			//bs1 = new MyBaseSprite(80, 80/*"http://www.isidrogilabert.com/img/vttennis.png"*/);
+			bs0 = new Sprite();
+			bs1 = new Sprite();
+			
+			bsBase = new MyBaseSprite("http://www.isidrogilabert.com/img/spaceball.png");
 
 			var sp:Sprite = new Sprite();
 			sp.x = 50;
@@ -144,6 +147,54 @@
 			var now:int = getTimer();
 			elapsedTimer = now - currentTimer;
 			currentTimer = now;
+			
+			if (/*bs1.onceLoaded &&*/ bsBase.onceLoaded)
+			{
+				
+				var bm:Bitmap;
+				
+				// Create class
+				var mbm:MyBitmap = new MyBitmap();
+				
+				// Create bitmap data to be copied
+				var mybmd:BitmapData = mbm.createBitmapData(bsBase.getWidth(), bsBase.getHeight(), bsBase);
+				
+				// Fetch bitmap data to bitmap
+				bm = mbm.createBitmap();
+
+				// And add it to the Sprite holder
+				bs1.addChild(bm);
+
+				bs1.x = 100;
+				bs1.y = 300;
+				panel.rawChildren.addChild(bs1);
+				
+				// Clone old bitmap data
+				var mybmd2:BitmapData = mybmd.clone();
+
+				// Add few changes to it			
+				mybmd2.setPixel(43,10, 0xff00ff00);
+				mybmd2.fillRect(new Rectangle(64, 64, 10, 10), 0xff0000ff);
+				
+				// And create a new Bitmap
+				var bm1:Bitmap = new Bitmap(mybmd2);
+				
+				bm1.rotation = 0;
+				bm1.x = -mybmd2.width>>1;
+				bm1.y = -mybmd2.height>>1;
+
+				// And add it to the Sprite holder
+				bs0.addChild(bm1);
+				
+				bs0.x = 0;
+				bs0.y = 0;
+				panel.rawChildren.addChild(bs0);
+				
+				//bs1.onceLoaded = false;
+				bsBase.onceLoaded = false;
+			}
+			
+			
 			if (isActive)
 			{
 				var caca:Bitmap;
@@ -152,7 +203,10 @@
 				{
 					canvas.rawChildren.addChild(caca);
 				}
-		    	tile1.move(elapsedTimer);
+		    	
+				var b1:Bitmap = tile1.move(elapsedTimer);
+				
+				
 		    	tile2.move(elapsedTimer);
 				
 				panel.setTitle("Papás:" + tile.getScore() + " Tenis: "+ tile1.getScore() + " Yummy: " + tile2.getScore() + " Elapsed: " + elapsedTimer);
@@ -168,32 +222,27 @@
 		public function onProgressStatus(e:ProgressEvent):void
 		{   
 		      // this is where progress will be monitored     
-		      trace(e.bytesLoaded, e.bytesTotal); 
-		      //Alert.show(e.bytesLoaded.toString());
+		      //trace(e.bytesLoaded, e.bytesTotal); 
 		}
 		
 		public function onLoaderReady(e:Event):void
 		{     
 		      // the image is now loaded, so let's add it to the display tree!     
-		      //Alert.show("Loaded!");
 		      MyApplication.canvas.rawChildren.addChild(myLoader);
-		      //myLoader.content.x = 10;
-		      //Alert.show("Added!");
-		      //MyApplication.app.addChild(myLoader.content);
-		      //MyApplication.app.addElement(MyApplication.myLoader);
 		}			
 		
 
         private function creationHandler(e:FlexEvent):void
         {
+			trace("Create button");
 			isActive = true;
             var button : Button = new Button();
             button.label = "My favorite button";
             button.styleName="halo"
-			button.x = width>>1;
-			button.y = height>>1;
+			button.x = panel.width>>1;
+			button.y = panel.height>>1;
             button.addEventListener(MouseEvent.CLICK, handleClick);
-            addChild( button );
+            /*panel.rawChildren.*/addChild( button );
         }
         
         private function handleClick(e:MouseEvent):void

@@ -211,7 +211,7 @@
         }
 
         private function progressHandler(event:ProgressEvent):void {
-            trace("progressHandler: bytesLoaded=" + event.bytesLoaded + " bytesTotal=" + event.bytesTotal);
+            //trace("progressHandler: bytesLoaded=" + event.bytesLoaded + " bytesTotal=" + event.bytesTotal);
         }
 
         private function unLoadHandler(event:Event):void {
