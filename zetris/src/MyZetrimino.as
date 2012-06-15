@@ -8,21 +8,83 @@ package
 		private var fasttick:int = 50;
 		private var firsttick:int = -2000;
 		
-		private var shape:Array =
+		private var shape1:Array =
+		[
 			[
-				[0,1],
-				[1,1],
-				[1,0]
-			];
+				[0,1,0],
+				[1,1,0],
+				[1,0,0],
+			]
+			,
+			[
+				[1,1,0],
+				[0,1,1],
+				[0,0,0],
+			]
+			,
+			[
+				[0,1,0],
+				[1,1,0],
+				[1,0,0],
+			]
+			,
+			[
+				[1,1,0],
+				[0,1,1],
+				[0,0,0],
+			]
+		]
+		;
+		
+		private var shape2:Array =
+		[
+			[
+				[0,1,0],
+				[0,1,0],
+				[1,1,0],
+			]
+			,
+			[
+				[1,0,0],
+				[1,1,1],
+				[0,0,0],
+			]
+			,
+			[
+				[1,1,0],
+				[1,0,0],
+				[1,0,0],
+			]
+			,
+			[
+				[1,1,1],
+				[0,0,1],
+				[0,0,0],
+			]
+		]
+		;
+		
+		private var shape:Array;
+		private var shapeTile:Array;
+		
+		private var shapes:Array = new Array;
 		
 		private var sprites:Array = new Array;
 		
 		private var posx:int, posy:int;
+		private var frame:int;
 		
 		private var timer:int;
 		
 		public function MyZetrimino(tiles:Array)
 		{
+			shapes.push(shape1);
+			shapes.push(shape2);
+			
+			shapeTile = shapes[Math.floor(Math.random()*(shapes.length))];
+			frame = Math.floor(Math.random()*(shapeTile.length));
+			shape = shapeTile[frame];
+			
 			for (var y:int = 0; y < shape.length; y++)
 			{
 				for (var x:int = 0; x < shape[y].length; x++)
@@ -76,16 +138,25 @@ package
 			{
 				for (var x:int = 0; x < shape[y].length; x++)
 				{
+					var spr:Sprite = sprites[y*shape[y].length + x];
+
 					if (shape[y][x] == 1)
 					{
-						var spr:Sprite = sprites[y*shape[y].length + x];
-						
+						// Pieza
 						spr.x = (posx + x) * MyApplication.ZT_TILES_SIZE;
 						spr.y = (posy + y) * MyApplication.ZT_TILES_SIZE;
 
 						if (!panel.rawChildren.contains(spr))
 						{
 							panel.rawChildren.addChild(spr);
+						}
+					}
+					else
+					{
+						// Blanco
+						if (panel.rawChildren.contains(spr))
+						{
+							panel.rawChildren.removeChild(spr);
 						}
 					}
 				}
@@ -104,6 +175,20 @@ package
 			
 			if(leftPressed) posx--;
 			if(rightPressed) posx++;
+			
+			if(upPressed)
+			{
+				var oldframe:int = frame;
+				frame++;
+				frame %= shapeTile.length;
+				shape = shapeTile[frame];
+				if (!checkGoodPos(board))
+				{
+					// Si no cabe, anulamos el giro
+					frame = oldframe;
+					shape = shapeTile[frame];
+				}
+			}
 			
 			if (downPressed && downReleased)
 			{

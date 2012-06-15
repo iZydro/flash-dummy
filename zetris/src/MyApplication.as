@@ -71,8 +71,7 @@
 		
 		private var leftPressed:Boolean, rightPressed:Boolean, upPressed:Boolean, downPressed:Boolean, downReleased:Boolean;
 		
-		private var gameOver:Boolean;
-		private var gameOverTimer:int;
+		private var gameover:GameOver = null;
 		
 		public function done():Canvas
 		{
@@ -127,20 +126,31 @@
 			
 			leftPressed = rightPressed = upPressed = downPressed = false;
 			downReleased = true;
-			gameOver = false;
+			gameover = null;
 		
 		}
 		
 		private function initGame():void
 		{
+			while(ztBoardTiles.length)
+			{
+				var sp:Sprite = ztBoardTiles.pop();
+				if (panel.rawChildren.contains(sp))
+				{
+					panel.rawChildren.removeChild(sp);
+				}
+			}
+			
+/*			
 			for (var h:int = 0; h < ztBoardTiles.length; h++)
 			{
 				if (panel.rawChildren.contains(ztBoardTiles[h]))
 				{
 					panel.rawChildren.removeChild(ztBoardTiles[h]);
 				}
+				delete ztBoardTiles[h];
 			}
-			
+*/			
 			for (var i:int = 0; i < ztBoardImages.length; i++)
 			{
 				var imgContainer1:Sprite = ztBoardImages[i];
@@ -164,18 +174,14 @@
 			elapsedTimer = now - currentTimer;
 			currentTimer = now;
 			
-			if (gameOver)
+			if (gameover)
 			{
-				gameOverTimer += elapsedTimer;
-				if (gameOverTimer >= 5000)
+				if (gameover.process(elapsedTimer, panel, ztBoardTiles))
 				{
 					initGame();
-					gameOver = false;
+					gameover = null;
 				}
-				else
-				{
-					return;
-				}
+				return;
 			}
 			
 			var px:int = Math.random() * ZT_TILES_X;
@@ -210,8 +216,7 @@
 					zetri.paint(panel);
 					zetri.unpaint(panel);
 					zetri = null;
-					gameOver = true;
-					gameOverTimer = 0;
+					gameover = new GameOver();
 				}
 			
 				downReleased = false;
