@@ -13,8 +13,8 @@ package
 		
 		public function process(elapsedTime:int, panel:Panel, board:MyBoard):Boolean
 		{
-			board.deleteOneTile(panel);
-			/*if (tiles.length > 0)
+			/*board.deleteOneTile(panel);
+			if (tiles.length > 0)
 			{
 				if (panel.rawChildren.contains(tiles[0]))
 				{

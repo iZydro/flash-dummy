@@ -103,7 +103,7 @@
 		
 		private function initGame():void
 		{
-			while(board.getNumTiles()) board.deleteOneTile(panel);
+			//while(board.getNumTiles()) board.deleteOneTile(panel);
 			
 			board.deleteBoardImages();
 
@@ -129,6 +129,7 @@
 				return;
 			}
 			
+			/*
 			var px:int = Math.random() * ZT_TILES_X;
 			var py:int = Math.random() * ZT_TILES_Y;
 			
@@ -141,6 +142,7 @@
 				imgContainer1.graphics.drawRoundRect(0, 0, ZT_TILES_SIZE, ZT_TILES_SIZE, 20);
 				imgContainer1.graphics.endFill();
 			}
+			*/
 			
 			zetri.paint(panel);
 			

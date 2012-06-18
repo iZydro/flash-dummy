@@ -37,6 +37,34 @@ package
 		;
 		
 		private var shape2:Array =
+			[
+				[
+					[1,0,0],
+					[1,1,0],
+					[0,1,0],
+				]
+				,
+				[
+					[0,1,1],
+					[1,1,0],
+					[0,0,0],
+				]
+				,
+				[
+					[1,0,0],
+					[1,1,0],
+					[0,1,0],
+				]
+				,
+				[
+					[0,1,1],
+					[1,1,0],
+					[0,0,0],
+				]
+			]
+			;
+		
+		private var shape3:Array =
 		[
 			[
 				[0,1,0],
@@ -64,6 +92,94 @@ package
 		]
 		;
 		
+		private var shape4:Array =
+			[
+				[
+					[1,0,0],
+					[1,0,0],
+					[1,1,0],
+				]
+				,
+				[
+					[1,1,1],
+					[1,0,0],
+					[0,0,0],
+				]
+				,
+				[
+					[1,1,0],
+					[0,1,0],
+					[0,1,0],
+				]
+				,
+				[
+					[0,0,1],
+					[1,1,1],
+					[0,0,0],
+				]
+			]
+			;
+		
+		private var shape5:Array =
+			[
+				[
+					[1,1,0],
+					[1,1,0],
+					[0,0,0],
+				]
+				,
+				[
+					[1,1,0],
+					[1,1,0],
+					[0,0,0],
+				]
+				,
+				[
+					[1,1,0],
+					[1,1,0],
+					[0,0,0],
+				]
+				,
+				[
+					[1,1,0],
+					[1,1,0],
+					[0,0,0],
+				]
+			]
+			;
+		
+		private var shape6:Array =
+			[
+				[
+					[1,1,1,1],
+					[0,0,0,0],
+					[0,0,0,0],
+					[0,0,0,0],
+				]
+				,
+				[
+					[0,1,0,0],
+					[0,1,0,0],
+					[0,1,0,0],
+					[0,1,0,0],
+				]
+				,
+				[
+					[1,1,1,1],
+					[0,0,0,0],
+					[0,0,0,0],
+					[0,0,0,0],
+				]
+				,
+				[
+					[0,1,0,0],
+					[0,1,0,0],
+					[0,1,0,0],
+					[0,1,0,0],
+				]
+			]
+			;
+		
 		private var shape:Array;
 		private var shapeTile:Array;
 		
@@ -81,9 +197,13 @@ package
 			
 			shapes.push(shape1);
 			shapes.push(shape2);
+			shapes.push(shape3);
+			shapes.push(shape4);
+			shapes.push(shape5);
+			shapes.push(shape6);
 			
 			shapeTile = shapes[Math.floor(Math.random()*(shapes.length))];
-			frame = Math.floor(Math.random()*(shapeTile.length));
+			frame = 0; // Math.floor(Math.random()*(shapeTile.length));
 			shape = shapeTile[frame];
 			
 			for (var y:int = 0; y < shape.length; y++)
@@ -133,9 +253,11 @@ package
 				if (panel.rawChildren.contains(sprites[i]))
 				{
 					var imgContainer1:Sprite = sprites[i];
-					imgContainer1.graphics.beginFill(0x00ffff);
+					panel.rawChildren.removeChild(imgContainer1);
+					
+					/*imgContainer1.graphics.beginFill(0x000000);
 					imgContainer1.graphics.drawRoundRect(0, 0, MyApplication.ZT_TILES_SIZE, MyApplication.ZT_TILES_SIZE, 20);
-					imgContainer1.graphics.endFill();
+					imgContainer1.graphics.endFill();*/
 				}
 			}
 		}
@@ -283,7 +405,13 @@ package
 				{
 					if (shape[y][x] == 1)
 					{
-						board.setZininoAt(y+posy, x+posx, 2); 
+						board.setZininoAt(y+posy, x+posx, 2);
+						
+						var sp:Sprite = board.getZininoImageAt(y+posy, x+posx);
+						sp.graphics.beginFill(0x000000);
+						sp.graphics.drawRoundRect(0, 0, MyApplication.ZT_TILES_SIZE, MyApplication.ZT_TILES_SIZE, 32);
+						sp.graphics.endFill();
+						
 					}
 				}
 			}
