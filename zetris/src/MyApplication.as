@@ -58,11 +58,8 @@
 		private var bs1:Sprite;
 		
 		private var tiles:Array = new Array;
-
-		private var ztBoard:Array = new Array;
-		private var ztBoardImages:Array = new Array;
-		private var ztBoardTiles:Array = new Array;
 		
+		private var board:MyBoard;
 		private var zetri:MyZetrimino;
 		
 		private var ztColors:Array = [ 0xff0000, 0x00ff00, 0x00ffff ];
@@ -81,40 +78,14 @@
         public function MyApplication()
         {
     	
-        	//app = this;
-
-        	//stage.frameRate = FRAMERATE;
-        	
-			//createMainPanel();
-			//addChild(MyApplication.mainPanel)
-
 			x=0;
 			y=0;
 			panel = new MyPanel();
 			this.addChild(panel);
 
-			
-			for (var y:int = 0; y < ZT_TILES_Y; y++)
-			{
-				for (var x:int = 0; x < ZT_TILES_X; x++)
-				{
-					var imgContainer1:Sprite = new Sprite();
-					imgContainer1.graphics.beginFill(0xff0000);
-					imgContainer1.graphics.drawRoundRect(0, 0, ZT_TILES_SIZE, ZT_TILES_SIZE, 20);
-					imgContainer1.graphics.endFill();
-					imgContainer1.x = x*ZT_TILES_SIZE;
-					imgContainer1.y = y*ZT_TILES_SIZE;
-					
-					//imgContainer.addChild(image);
-					
-					panel.rawChildren.addChild(imgContainer1);
-					ztBoard.push(0);
-					ztBoardImages.push(imgContainer1);
+			board = new MyBoard(ZT_TILES_Y, ZT_TILES_X, ZT_TILES_SIZE, panel);
 
-				}
-			}
-			
-			zetri = new MyZetrimino(ztBoardTiles);
+			zetri = new MyZetrimino(board);
 	
 			currentTimer = getTimer();
 
@@ -132,39 +103,13 @@
 		
 		private function initGame():void
 		{
-			while(ztBoardTiles.length)
-			{
-				var sp:Sprite = ztBoardTiles.pop();
-				if (panel.rawChildren.contains(sp))
-				{
-					panel.rawChildren.removeChild(sp);
-				}
-			}
+			while(board.getNumTiles()) board.deleteOneTile(panel);
 			
-/*			
-			for (var h:int = 0; h < ztBoardTiles.length; h++)
-			{
-				if (panel.rawChildren.contains(ztBoardTiles[h]))
-				{
-					panel.rawChildren.removeChild(ztBoardTiles[h]);
-				}
-				delete ztBoardTiles[h];
-			}
-*/			
-			for (var i:int = 0; i < ztBoardImages.length; i++)
-			{
-				var imgContainer1:Sprite = ztBoardImages[i];
-				imgContainer1.graphics.beginFill(0xff0000);
-				imgContainer1.graphics.drawRoundRect(0, 0, ZT_TILES_SIZE, ZT_TILES_SIZE, 20);
-				imgContainer1.graphics.endFill();
-			}
+			board.deleteBoardImages();
+
+			board.deleteZininos();
 			
-			for (var j:int = 0; j < ztBoard.length; j++)
-			{
-				ztBoard[j] = 0;
-			}
-			
-			zetri = new MyZetrimino(ztBoardTiles);
+			zetri = new MyZetrimino(board);
 		}
 
 	    private function onTimerTick(event:TimerEvent):void
@@ -176,7 +121,7 @@
 			
 			if (gameover)
 			{
-				if (gameover.process(elapsedTimer, panel, ztBoardTiles))
+				if (gameover.process(elapsedTimer, panel, board))
 				{
 					initGame();
 					gameover = null;
@@ -187,12 +132,11 @@
 			var px:int = Math.random() * ZT_TILES_X;
 			var py:int = Math.random() * ZT_TILES_Y;
 			
-			if (ztBoard[py * ZT_TILES_X + px] == 0)
+			if (board.getZininoAt(py, px) == 0)
 			{
-				ztBoard[py * ZT_TILES_X + px] = 1;
+				board.setZininoAt(py, px, 1);
 				
-				var cell:int = ztBoard[py * ZT_TILES_X + px];
-				var imgContainer1:Sprite = ztBoardImages[py * ZT_TILES_X + px];
+				var imgContainer1:Sprite = board.getImageAt(py, px);
 				imgContainer1.graphics.beginFill(0x00ff00);
 				imgContainer1.graphics.drawRoundRect(0, 0, ZT_TILES_SIZE, ZT_TILES_SIZE, 20);
 				imgContainer1.graphics.endFill();
@@ -200,26 +144,28 @@
 			
 			zetri.paint(panel);
 			
-			var done:Boolean = zetri.move(ztBoard, elapsedTimer, leftPressed, rightPressed, upPressed, downPressed, downReleased);
+			var done:Boolean = zetri.move(board, elapsedTimer, leftPressed, rightPressed, upPressed, downPressed, downReleased);
 			if (done)
 			{
-				zetri.consolidate(ztBoard);
+				zetri.consolidate(board);
 				zetri.unpaint(panel);
 				zetri = null;
 				
-				zetri = new MyZetrimino(ztBoardTiles);
+				board.checkCompleteLines();
 				
-				if (!zetri.checkGoodPos(ztBoard))
+				zetri = new MyZetrimino(board);
+				
+				if (!zetri.checkGoodPos(board))
 				{
 					// GAME OVER!
-					zetri.consolidate(ztBoard);
+					zetri.consolidate(board);
 					zetri.paint(panel);
 					zetri.unpaint(panel);
 					zetri = null;
 					gameover = new GameOver();
 				}
 			
-				downReleased = false;
+				if (downPressed) downReleased = false;
 			}
 			
 			leftPressed = rightPressed = upPressed = downPressed = false;

@@ -76,8 +76,9 @@ package
 		
 		private var timer:int;
 		
-		public function MyZetrimino(tiles:Array)
+		public function MyZetrimino(board:MyBoard)
 		{
+			
 			shapes.push(shape1);
 			shapes.push(shape2);
 			
@@ -96,7 +97,10 @@ package
 					imgContainer1.x = x * MyApplication.ZT_TILES_SIZE;
 					imgContainer1.y = y * MyApplication.ZT_TILES_SIZE;
 					sprites.push(imgContainer1);
-					tiles.push(imgContainer1);
+					
+					// Add the Sprite to the board's sprites list
+					board.addTile(imgContainer1);
+
 				}
 			}
 			
@@ -117,6 +121,11 @@ package
 			return posy;
 		}
 		
+		public function getShape():Array
+		{
+			return shape;			
+		}
+		
 		public function unpaint(panel:MyPanel):void
 		{
 			for (var i:int = 0; i < sprites.length; i++)
@@ -127,7 +136,6 @@ package
 					imgContainer1.graphics.beginFill(0x00ffff);
 					imgContainer1.graphics.drawRoundRect(0, 0, MyApplication.ZT_TILES_SIZE, MyApplication.ZT_TILES_SIZE, 20);
 					imgContainer1.graphics.endFill();
-					//panel.rawChildren.removeChild(sprites[i]);
 				}
 			}
 		}
@@ -163,7 +171,7 @@ package
 			}
 		}
 		
-		public function move(board:Array, elapsed:int, leftPressed:Boolean, rightPressed:Boolean, upPressed:Boolean, downPressed:Boolean, downReleased:Boolean):Boolean
+		public function move(board:MyBoard, elapsed:int, leftPressed:Boolean, rightPressed:Boolean, upPressed:Boolean, downPressed:Boolean, downReleased:Boolean):Boolean
 		{
 			var VALID:Boolean = false;
 			var INVALID:Boolean = true;
@@ -244,7 +252,7 @@ package
 		}
 		
 		
-		public function checkGoodPos(board:Array):Boolean
+		public function checkGoodPos(board:MyBoard):Boolean
 		{
 			// Comprobamos que ninguna tile del zetrimino está fuera del panel
 			
@@ -257,7 +265,7 @@ package
 						if ( (x+posx) < 0 || (x+posx >= MyApplication.ZT_TILES_X) ) return false;
 						if ( (y+posy) < 0 || (y+posy >= MyApplication.ZT_TILES_Y) ) return false;
 						
-						if (board[ (y+posy) * MyApplication.ZT_TILES_X + (x+posx)] == 2) return false;
+						if (board.getZininoAt(y+posy, x+posx) == 2) return false;
 					}
 				}
 			}
@@ -265,7 +273,7 @@ package
 			return true;
 		}
 
-		public function consolidate(board:Array):void
+		public function consolidate(board:MyBoard):void
 		{
 			// Comprobamos que ninguna tile del zetrimino está fuera del panel
 			
@@ -275,7 +283,7 @@ package
 				{
 					if (shape[y][x] == 1)
 					{
-						board[(y+posy) * MyApplication.ZT_TILES_X + (x+posx)] = 2;
+						board.setZininoAt(y+posy, x+posx, 2); 
 					}
 				}
 			}
