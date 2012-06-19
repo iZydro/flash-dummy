@@ -31,6 +31,11 @@
 		public static var ZT_TILES_Y:int = 12;
 		public static var ZT_TILES_SIZE:int = 32;
 		
+		private var ZETRI_STATUS_MOVING:int = 1;
+		private var ZETRI_STATUS_CONSOLIDATING:int = 2;
+		
+		private var zetriStatus:int;
+		
 		private var isActive:Boolean = false;
 
 		private static var myLoader:Loader;
@@ -86,6 +91,7 @@
 			board = new MyBoard(ZT_TILES_Y, ZT_TILES_X, ZT_TILES_SIZE, panel);
 
 			zetri = new MyZetrimino(board);
+			zetriStatus = ZETRI_STATUS_MOVING;
 	
 			currentTimer = getTimer();
 
@@ -110,6 +116,8 @@
 			board.deleteZininos();
 			
 			zetri = new MyZetrimino(board);
+			zetriStatus = ZETRI_STATUS_MOVING;
+
 		}
 
 	    private function onTimerTick(event:TimerEvent):void
@@ -129,6 +137,26 @@
 				return;
 			}
 			
+			switch(zetriStatus)
+			{
+				case ZETRI_STATUS_MOVING:
+					moveZetrimino();
+					break;
+				
+				case ZETRI_STATUS_CONSOLIDATING:
+					break;
+					
+			}
+
+			// Clear keyboard
+			leftPressed = rightPressed = upPressed = downPressed = false;
+			
+			panel.setTitle("Elapsed: " + elapsedTimer);
+		}
+
+		
+		private function moveZetrimino():void
+		{
 			zetri.paint(panel);
 			
 			var done:Boolean = zetri.move(board, elapsedTimer, leftPressed, rightPressed, upPressed, downPressed, downReleased);
@@ -141,7 +169,8 @@
 				board.checkCompleteLines();
 				
 				zetri = new MyZetrimino(board);
-				
+				zetriStatus = ZETRI_STATUS_MOVING;
+
 				if (!zetri.checkGoodPos(board))
 				{
 					// GAME OVER!
@@ -154,109 +183,7 @@
 			
 				if (downPressed) downReleased = false;
 			}
-			
-			leftPressed = rightPressed = upPressed = downPressed = false;
-			
-			return;
-			
-	    	//Alert.show("Timer!");
-			if (bsBase.onceLoaded)
-			{
-				
-				var bm:Bitmap;
-				
-				// Create class
-				var mbm:MyBitmap = new MyBitmap();
-				
-				// Create bitmap data to be copied
-				var mybmd:BitmapData = mbm.createBitmapData(bsBase.getWidth(), bsBase.getHeight(), bsBase);
-				
-				// Fetch bitmap data to bitmap
-				bm = mbm.createBitmap();
-
-				// And add it to the Sprite holder
-				bs1.addChild(bm);
-
-				bs1.x = 100;
-				bs1.y = 300;
-				panel.rawChildren.addChild(bs1);
-				
-				
-				// Clone old bitmap data
-				var mybmd2:BitmapData = mybmd.clone();
-
-				// Add few changes to it			
-				mybmd2.setPixel(43,10, 0xff00ff00);
-				mybmd2.fillRect(new Rectangle(64, 64, 10, 10), 0xff0000ff);
-				
-				// And create a new Bitmap
-				var bm1:Bitmap = new Bitmap(mybmd2);
-				
-				bm1.rotation = 0;
-				bm1.x = 0;
-				bm1.y = 0;
-				bm1.transform.matrix = new Matrix(1, 0, 0, 1, -bm1.width>>1, -bm1.height>>1);
-
-				// And add it to the Sprite holder
-				bs0.addChild(bm1);
-				bs0.x = 0;
-				bs0.y = 0;
-				//bs0.transform.matrix = new Matrix(1, 0, 0, 1, -mybmd2.width>>1, -mybmd2.height>>1);
-
-				panel.rawChildren.addChild(bs0);
-				
-				for (var i:int = 0; i < 20; i++)
-				{
-					var _sp:Sprite = new Sprite();
-					var _bm:Bitmap = new Bitmap(mybmd2);
-					_bm.transform.matrix = new Matrix(1, 0, 0, 1, -_bm.width>>1, -_bm.height>>1);
-					_sp.addChild(_bm);
-					_sp.x = 0;//i*30;
-					_sp.y = 0;//i*25;
-					_sp.rotation = (i*18) % 360;
-					
-					var mt:MyTile = new MyTile();
-					mt.createFromSprite(_sp);
-					panel.rawChildren.addChild(mt.tile);
-					
-					//panel.rawChildren.addChild(_sp);
-					
-					tiles.push(mt);
-				}
-				
-				bsBase.onceLoaded = false;
-			}
-			
-			
-			if (isActive)
-			{
-				bs0.rotation += 10;
-				bs0.rotation %= 360;
-				
-				var caca:Bitmap;
-				caca = tile.move(elapsedTimer);
-		    	if (caca != null)
-				{
-					canvas.rawChildren.addChild(caca);
-				}
-		    	
-				var b1:Bitmap = tile1.move(elapsedTimer);
-				
-				
-		    	tile2.move(elapsedTimer);
-				
-				
-				for(var cnt:int = 0; cnt < tiles.length; cnt++)
-				{
-					//trace(i+". Posicion: "+nombrearray[i]);
-					tiles[cnt].move(elapsedTimer);
-				}
-				
-				
-				
-				panel.setTitle("Papás:" + tile.getScore() + " Tenis: "+ tile1.getScore() + " Yummy: " + tile2.getScore() + " Elapsed: " + elapsedTimer);
-			}
-	    	
+				    	
 	    }
 		
 		public function addScore(score:int):void

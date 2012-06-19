@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" creationComplete="initApp()" addedToStage="addedApp()" frameRate="30" width="1024" height="768" backgroundColor="red">
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" creationComplete="initApp()" addedToStage="addedApp()" frameRate="30" width="1024" height="768" backgroundColor="red">
 <mx:Canvas id="mainpanel" width="1024" height="768" backgroundColor="blue" horizontalCenter="0" verticalCenter="0">
 	<mx:Script>
 		<![CDATA[

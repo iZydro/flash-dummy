@@ -214,8 +214,8 @@ package
 					imgContainer1.graphics.beginFill(0x0000ff);
 					imgContainer1.graphics.drawRoundRect(0, 0, MyApplication.ZT_TILES_SIZE, MyApplication.ZT_TILES_SIZE, 20);
 					imgContainer1.graphics.endFill();
-					imgContainer1.x = x * MyApplication.ZT_TILES_SIZE;
-					imgContainer1.y = y * MyApplication.ZT_TILES_SIZE;
+					imgContainer1.x = x * MyApplication.ZT_TILES_SIZE + 50;
+					imgContainer1.y = y * MyApplication.ZT_TILES_SIZE + 50;
 					sprites.push(imgContainer1);
 					
 					// Add the Sprite to the board's current Tetrimino sprites list
@@ -273,8 +273,8 @@ package
 					if (shape[y][x] == 1)
 					{
 						// Pieza
-						spr.x = (posx + x) * MyApplication.ZT_TILES_SIZE;
-						spr.y = (posy + y) * MyApplication.ZT_TILES_SIZE;
+						spr.x = (posx + x) * MyApplication.ZT_TILES_SIZE + 50;
+						spr.y = (posy + y) * MyApplication.ZT_TILES_SIZE + 50;
 
 						if (!panel.rawChildren.contains(spr))
 						{

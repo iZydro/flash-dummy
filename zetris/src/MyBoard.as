@@ -38,8 +38,8 @@ package
 					imgContainer1.graphics.endFill();
 					
 					// Place it at its x and y position
-					imgContainer1.x = x*size_tile;
-					imgContainer1.y = y*size_tile;
+					imgContainer1.x = x*size_tile + 50;
+					imgContainer1.y = y*size_tile + 50;
 					
 					// Add it to the panel
 					panel.rawChildren.addChild(imgContainer1);
@@ -56,8 +56,8 @@ package
 					imgContainer2.graphics.endFill();
 					
 					// Place it at its x and y position
-					imgContainer2.x = x*size_tile;
-					imgContainer2.y = y*size_tile;
+					imgContainer2.x = x*size_tile + 50;
+					imgContainer2.y = y*size_tile + 50;
 					
 					// Add it to the panel
 					panel.rawChildren.addChild(imgContainer2);
