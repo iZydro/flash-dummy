@@ -218,7 +218,7 @@ package
 					imgContainer1.y = y * MyApplication.ZT_TILES_SIZE;
 					sprites.push(imgContainer1);
 					
-					// Add the Sprite to the board's sprites list
+					// Add the Sprite to the board's current Tetrimino sprites list
 					board.addTile(imgContainer1);
 
 				}
