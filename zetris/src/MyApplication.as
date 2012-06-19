@@ -129,21 +129,6 @@
 				return;
 			}
 			
-			/*
-			var px:int = Math.random() * ZT_TILES_X;
-			var py:int = Math.random() * ZT_TILES_Y;
-			
-			if (board.getZininoAt(py, px) == 0)
-			{
-				board.setZininoAt(py, px, 1);
-				
-				var imgContainer1:Sprite = board.getImageAt(py, px);
-				imgContainer1.graphics.beginFill(0x00ff00);
-				imgContainer1.graphics.drawRoundRect(0, 0, ZT_TILES_SIZE, ZT_TILES_SIZE, 20);
-				imgContainer1.graphics.endFill();
-			}
-			*/
-			
 			zetri.paint(panel);
 			
 			var done:Boolean = zetri.move(board, elapsedTimer, leftPressed, rightPressed, upPressed, downPressed, downReleased);

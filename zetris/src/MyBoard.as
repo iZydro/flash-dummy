@@ -7,7 +7,7 @@ package
 	public class MyBoard
 	{
 		private var ztBoard:Array = new Array;
-		private var ztBoardImages:Array = new Array;
+		private var ztBoardBackgroundImages:Array = new Array;
 		private var ztBoardImagesZinino:Array = new Array;
 		
 		private var ztBoardTiles:Array = new Array;
@@ -45,7 +45,7 @@ package
 					panel.rawChildren.addChild(imgContainer1);
 					
 					// And save the Sprite for further access 
-					ztBoardImages.push(imgContainer1);
+					ztBoardBackgroundImages.push(imgContainer1);
 
 					
 					var imgContainer2:Sprite = new Sprite();
@@ -98,12 +98,6 @@ package
 			return imgContainer1;
 		}
 		
-		public function getImageAt(y:int, x:int):Sprite
-		{
-			var imgContainer1:Sprite = ztBoardImages[y * size_x + x];
-			return imgContainer1;
-		}
-
 		public function getZininoAt(y:int, x:int):int
 		{
 			var zinino:int = ztBoard[y * size_x + x];
@@ -125,9 +119,9 @@ package
 		
 		public function deleteBoardImages():void
 		{
-			for (var i:int = 0; i < ztBoardImages.length; i++)
+			for (var i:int = 0; i < ztBoardBackgroundImages.length; i++)
 			{
-				var imgContainer1:Sprite = ztBoardImages[i];
+				var imgContainer1:Sprite = ztBoardBackgroundImages[i];
 				imgContainer1.graphics.beginFill(0xff0000);
 				imgContainer1.graphics.drawRoundRect(0, 0, size_tile, size_tile, 20);
 				imgContainer1.graphics.endFill();
@@ -142,7 +136,9 @@ package
 		
 		public function checkCompleteLines():void
 		{
-			for (var y:int = size_y-1; y >= 0; y--)
+			var y:int = size_y-1; // We start from the bottom line
+			while (y >= 0)
+			//for (var y:int = size_y-1; y >= 0; y--)
 			{
 				var complete:Boolean = true;
 				for (var x:int = 0; x < size_x; x++)
@@ -184,6 +180,10 @@ package
 							
 						}
 					}
+				}
+				else
+				{
+					y--;
 				}
 			}	
 		}
