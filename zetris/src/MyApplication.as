@@ -36,6 +36,10 @@
 		
 		private var zetriStatus:int;
 		
+		private var APP_STATUS_LOADING:int = 1;
+		private var APP_STATUS_RUNNING:int = 2;
+		private var appStatus:int;
+		
 		private var isActive:Boolean = false;
 
 		private static var myLoader:Loader;
@@ -69,6 +73,9 @@
 		
 		private var ztColors:Array = [ 0xff0000, 0x00ff00, 0x00ffff ];
 		
+		// Sprite used as a template to clone new ones
+		public static var sp:MyBaseSprite;
+
 		private var bsBase:MyBaseSprite;
 		
 		private var leftPressed:Boolean, rightPressed:Boolean, upPressed:Boolean, downPressed:Boolean, downReleased:Boolean;
@@ -82,34 +89,39 @@
 		
         public function MyApplication()
         {
+			appStatus = APP_STATUS_LOADING;
     	
-			var sp:Sprite = new Sprite();
-			sp.graphics.beginFill(0xff0000);
-			sp.graphics.drawRoundRect(0, 0, 10, 10, 20);
-			sp.graphics.endFill();
+			sp = new MyBaseSprite();
+			//sp.graphics.beginFill(0xff0000);
+			//sp.graphics.drawRoundRect(0, 0, 10, 10, 20);
+			//sp.graphics.endFill();
 			
 			x=0;
 			y=0;
 			panel = new MyPanel();
 			this.addChild(panel);
 
-			board = new MyBoard(ZT_TILES_Y, ZT_TILES_X, ZT_TILES_SIZE, panel, sp);
-
-			zetri = new MyZetrimino(board);
-			zetriStatus = ZETRI_STATUS_MOVING;
-	
 			currentTimer = getTimer();
-
-	        timer = new Timer(DELAY);
-	        timer.addEventListener(TimerEvent.TIMER, onTimerTick);
+			
+			timer = new Timer(DELAY);
+			timer.addEventListener(TimerEvent.TIMER, onTimerTick);
 			timer.start();
-
+			
 			addEventListener(FlexEvent.CREATION_COMPLETE, creationHandler);
 			
 			leftPressed = rightPressed = upPressed = downPressed = false;
 			downReleased = true;
 			gameover = null;
+			
+		}
 		
+		private function initBoardAndTiles():void
+		{
+			board = new MyBoard(ZT_TILES_Y, ZT_TILES_X, ZT_TILES_SIZE, panel, sp);
+
+			zetri = new MyZetrimino(board);
+			zetriStatus = ZETRI_STATUS_MOVING;
+	
 		}
 		
 		private function initGame():void
@@ -127,17 +139,36 @@
 
 	    private function onTimerTick(event:TimerEvent):void
 	    {
-			
 			var now:int = getTimer();
 			elapsedTimer = now - currentTimer;
 			currentTimer = now;
 			
+			switch(appStatus)
+			{
+				case APP_STATUS_LOADING:
+					if (sp.isActive)
+					{
+						initBoardAndTiles();
+						appStatus = APP_STATUS_RUNNING;
+					}
+					break;
+				
+				case APP_STATUS_RUNNING:
+					runGame();
+			}
+		}
+		
+		private function runGame():void
+		{
 			if (gameover)
 			{
 				if (gameover.process(elapsedTimer, panel, board))
 				{
 					initGame();
 					gameover = null;
+
+					// Clear keyboard
+					leftPressed = rightPressed = upPressed = downPressed = false;
 				}
 				return;
 			}

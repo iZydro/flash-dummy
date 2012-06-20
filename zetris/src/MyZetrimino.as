@@ -1,6 +1,8 @@
 package
 {
 	import flash.display.Sprite;
+	import flash.display.Bitmap;
+	import flash.display.BitmapData;
 	
 	public class MyZetrimino
 	{
@@ -397,21 +399,62 @@ package
 
 		public function consolidate(board:MyBoard):void
 		{
-			// Comprobamos que ninguna tile del zetrimino está fuera del panel
-			
 			for (var y:int = 0; y < shape.length; y++)
 			{
 				for (var x:int = 0; x < shape[y].length; x++)
 				{
 					if (shape[y][x] == 1)
 					{
-						board.setZininoAt(y+posy, x+posx, 2);
+						var sp:Sprite = new Sprite();//board.getZininoImageAt(y+posy, x+posx);
 						
+						
+						var bm:Bitmap;
+						
+						// Create class
+						var mbm:MyBitmap = new MyBitmap();
+						
+						// Create bitmap data to be copied
+						//var mybmd:BitmapData = mbm.createBitmapData(bsBase.width, bsBase.height, bsBase);
+						var mybmd:BitmapData = mbm.createBitmapData(MyApplication.ZT_TILES_SIZE, MyApplication.ZT_TILES_SIZE, MyApplication.sp);
+						
+						// Fetch bitmap data to bitmap
+						bm = mbm.createBitmap();
+						bm.x = 0;//size_tile >> 1;
+						bm.y = 0;//size_tile >> 1;
+						
+						// And add it to the Sprite holder
+						sp.addChild(bm);
+						
+						
+						sp.visible = true;
+/*						
+						sp.graphics.beginFill(0xff0000);
+						sp.graphics.drawRoundRect(0, 0, MyApplication.ZT_TILES_SIZE, MyApplication.ZT_TILES_SIZE, 32);
+						sp.graphics.endFill();
+*/						
+						sp.x =  (x+posx) * MyApplication.ZT_TILES_SIZE + 50;
+						sp.y =  (y+posy) * MyApplication.ZT_TILES_SIZE + 50;
+						
+						// Set the new image
+						
+						var sp_behind:Sprite = board.getZininoImageAt(y+posy, x+posx);
+						if (sp_behind == null)
+						{
+							// There was ni Zinino there already
+							board.setZininoImageAt(y+posy, x+posx, sp);
+							board.boardPanel.rawChildren.addChild(sp);
+							
+							// Set the logical piece
+							board.setZininoAt(y+posy, x+posx, 2);
+						}
+
+/*						
 						var sp:Sprite = board.getZininoImageAt(y+posy, x+posx);
+						sp.visible = true;
 						sp.graphics.beginFill(0x000000);
 						sp.graphics.drawRoundRect(0, 0, MyApplication.ZT_TILES_SIZE, MyApplication.ZT_TILES_SIZE, 32);
 						sp.graphics.endFill();
-						
+*/						
 					}
 				}
 			}
