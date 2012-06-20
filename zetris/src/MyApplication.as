@@ -83,12 +83,17 @@
         public function MyApplication()
         {
     	
+			var sp:Sprite = new Sprite();
+			sp.graphics.beginFill(0xff0000);
+			sp.graphics.drawRoundRect(0, 0, 10, 10, 20);
+			sp.graphics.endFill();
+			
 			x=0;
 			y=0;
 			panel = new MyPanel();
 			this.addChild(panel);
 
-			board = new MyBoard(ZT_TILES_Y, ZT_TILES_X, ZT_TILES_SIZE, panel);
+			board = new MyBoard(ZT_TILES_Y, ZT_TILES_X, ZT_TILES_SIZE, panel, sp);
 
 			zetri = new MyZetrimino(board);
 			zetriStatus = ZETRI_STATUS_MOVING;

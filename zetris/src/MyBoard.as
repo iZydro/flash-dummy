@@ -4,6 +4,9 @@ package
 	import mx.controls.*;
 	import mx.containers.*;
 	
+	import flash.display.Bitmap;
+	import flash.display.BitmapData;
+
 	public class MyBoard
 	{
 		private var ztBoard:Array = new Array;
@@ -16,7 +19,7 @@ package
 		private var size_y:int;
 		private var size_tile:int;
 		
-		public function MyBoard(given_y:int, given_x:int, given_tile:int, panel:Panel)
+		public function MyBoard(given_y:int, given_x:int, given_tile:int, panel:Panel, bsBase:Sprite)
 		{
 			size_x = given_x;
 			size_y = given_y;
@@ -31,6 +34,20 @@ package
 					
 					// Create a sprite for each cell of the board (background)
 					var imgContainer1:Sprite = new Sprite();
+					
+					var bm:Bitmap;
+					
+					// Create class
+					var mbm:MyBitmap = new MyBitmap();
+					
+					// Create bitmap data to be copied
+					var mybmd:BitmapData = mbm.createBitmapData(bsBase.width, bsBase.height, bsBase);
+					
+					// Fetch bitmap data to bitmap
+					bm = mbm.createBitmap();
+					
+					// And add it to the Sprite holder
+					imgContainer1.addChild(bm);
 					
 					// Draw a standard shape on the sprite
 					imgContainer1.graphics.beginFill(0xff0000);
