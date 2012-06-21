@@ -117,13 +117,13 @@ package
 			return ztBoardTiles.length;	
 		}
 
-		public function getZininoImageAt(y:int, x:int):Sprite
+		public function getZininoImageAt(y:int, x:int):MyZydroSprite
 		{
-			var imgContainer1:Sprite = ztBoardImagesZinino[y * size_x + x];
+			var imgContainer1:MyZydroSprite = ztBoardImagesZinino[y * size_x + x];
 			return imgContainer1;
 		}
 		
-		public function setZininoImageAt(y:int, x:int, sp:Sprite):void
+		public function setZininoImageAt(y:int, x:int, sp:MyZydroSprite):void
 		{
 			ztBoardImagesZinino[y * size_x + x] = sp;
 		}
@@ -156,20 +156,36 @@ package
 				imgContainer1.graphics.drawRoundRect(0, 0, size_tile, size_tile, 20);
 				imgContainer1.graphics.endFill();
 								
-				var imgContainer2:Sprite = ztBoardImagesZinino[i];
-				if (imgContainer2 != null)
+				var myz:MyZydroSprite = ztBoardImagesZinino[i];
+				if (myz != null)
 				{
-					imgContainer2.visible = false;
-					imgContainer2.graphics.beginFill(0xffffff);
-					imgContainer2.graphics.drawRoundRect(0, 0, size_tile, size_tile, 32);
-					imgContainer2.graphics.endFill();
-					boardPanel.rawChildren.removeChild(imgContainer2);
-					imgContainer2 = null;
+					var imgContainer2:Sprite = myz.getSprite();
+					if (imgContainer2 != null)
+					{
+						imgContainer2.visible = false;
+						imgContainer2.graphics.beginFill(0xffffff);
+						imgContainer2.graphics.drawRoundRect(0, 0, size_tile, size_tile, 32);
+						imgContainer2.graphics.endFill();
+						boardPanel.rawChildren.removeChild(imgContainer2);
+						imgContainer2 = null;
+					}
 					ztBoardImagesZinino[i] = null;
 				}
 			}
 		}
 		
+		public function updateZetriminos():void
+		{
+			for (var i:int = 0; i < ztBoardImagesZinino.length; i++)
+			{
+				var myz:MyZydroSprite = ztBoardImagesZinino[i];
+				if (myz)
+				{
+					myz.update();
+				}
+			}			
+			
+		}
 		
 		public function checkCompleteLines():void
 		{
@@ -187,8 +203,9 @@ package
 					// Clear the line
 					for (var cx:int = 0; cx < size_x; cx++)
 					{
+						// Clear the complete line
 						setZininoAt(y, cx, 0);
-						var sp2clear:Sprite = getZininoImageAt(y, cx);
+						var sp2clear:Sprite = getZininoImageAt(y, cx).getSprite();
 						boardPanel.rawChildren.removeChild(sp2clear);
 						setZininoImageAt(y, cx, null);
 						
@@ -209,10 +226,14 @@ package
 						{
 							setZininoAt(my+1, mx, my < 0 ? 0 : getZininoAt(my, mx));
 							
-							var tile:int = my < 0 ? 0 : getZininoAt(my, mx);
+							//var tile:int = my < 0 ? 0 : getZininoAt(my, mx);
 							
-							var sp:Sprite = getZininoImageAt(my, mx);
-							if (sp != null) sp.y += MyApplication.ZT_TILES_SIZE;
+							var sp:MyZydroSprite = getZininoImageAt(my, mx);
+							if (sp != null)
+							{
+								sp.setNewY(sp.getNewY() + MyApplication.ZT_TILES_SIZE);
+								//sp.update();
+							}
 							setZininoImageAt(my+1, mx, sp);
 							setZininoImageAt(my, mx, null);
 							

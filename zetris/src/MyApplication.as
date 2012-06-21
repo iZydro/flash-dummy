@@ -2,12 +2,12 @@
 {
     import flash.display.Bitmap;
     import flash.display.BitmapData;
+    import flash.display.DisplayObject;
     import flash.display.Graphics;
     import flash.display.Loader;
     import flash.display.Shape;
     import flash.display.Sprite;
-	import flash.display.DisplayObject;
-	import flash.events.*;
+    import flash.events.*;
     import flash.events.Event;
     import flash.events.KeyboardEvent;
     import flash.events.TimerEvent;
@@ -193,11 +193,17 @@
 				
 				case ZETRI_STATUS_CONSOLIDATING:
 					consolidateZetrimino(elapsedTimer);
+					if (downPressed) downReleased = false;
 					break;
 					
 			}
+			
+			// Update Zetriminos animation
+			
+			board.updateZetriminos();
 
 			// Clear keyboard
+			
 			leftPressed = rightPressed = upPressed = downPressed = false;
 			
 			panel.setTitle("Elapsed: " + elapsedTimer);
@@ -239,9 +245,6 @@
 					zetri = null;
 					gameover = new GameOver();
 				}
-			
-				if (downPressed) downReleased = false;
-				
 				zetriStatus = ZETRI_STATUS_MOVING;
 			}
 	    }

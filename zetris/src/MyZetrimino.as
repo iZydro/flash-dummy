@@ -1,8 +1,8 @@
 package
 {
-	import flash.display.Sprite;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
+	import flash.display.Sprite;
 	
 	public class MyZetrimino
 	{
@@ -435,14 +435,20 @@ package
 						sp.x =  (x+posx) * MyApplication.ZT_TILES_SIZE + 50;
 						sp.y =  (y+posy) * MyApplication.ZT_TILES_SIZE + 50;
 						
+						// Create the MyZydroSprite
+						var myz:MyZydroSprite = new MyZydroSprite(sp);
+						myz.setX( (x+posx) * MyApplication.ZT_TILES_SIZE + 50);
+						myz.setY( (y+posy) * MyApplication.ZT_TILES_SIZE + 50);
+						//myz.update();
+						
 						// Set the new image
 						
-						var sp_behind:Sprite = board.getZininoImageAt(y+posy, x+posx);
+						var sp_behind:MyZydroSprite = board.getZininoImageAt(y+posy, x+posx);
 						if (sp_behind == null)
 						{
-							// There was ni Zinino there already
-							board.setZininoImageAt(y+posy, x+posx, sp);
-							board.boardPanel.rawChildren.addChild(sp);
+							// There was a Zinino there already
+							board.setZininoImageAt(y+posy, x+posx, myz);
+							board.boardPanel.rawChildren.addChild(myz.getSprite());
 							
 							// Set the logical piece
 							board.setZininoAt(y+posy, x+posx, 2);
