@@ -40,7 +40,7 @@ package
 			myWidth = width;
 			myHeight = height;
 			
-			trace("Creating BitmapData w: "+myWidth + " h: " + myHeight);
+			//trace("Creating BitmapData w: "+myWidth + " h: " + myHeight);
 			
 			bd2 = new BitmapData(myWidth, myHeight, true, 0xffff0000);
 			var mat:Matrix = new Matrix();
@@ -49,8 +49,8 @@ package
 			mat.translate(myWidth>>1, myHeight>>1);
 			if (filler != null) bd2.draw(filler,mat);
 			mat.translate(0, 0);
-			bd2.setPixel(0, 0, 0xffffff);
-			bd2.setPixel(16, 16, 0xff0000);
+			//bd2.setPixel(0, 0, 0xffffff);
+			//bd2.setPixel(16, 16, 0xff0000);
 			
 			return bd2;
 		}

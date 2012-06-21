@@ -6,7 +6,8 @@
     import flash.display.Loader;
     import flash.display.Shape;
     import flash.display.Sprite;
-    import flash.events.*;
+	import flash.display.DisplayObject;
+	import flash.events.*;
     import flash.events.Event;
     import flash.events.KeyboardEvent;
     import flash.events.TimerEvent;
@@ -35,6 +36,7 @@
 		private var ZETRI_STATUS_CONSOLIDATING:int = 2;
 		
 		private var zetriStatus:int;
+		private var zetriTimer:int;
 		
 		private var APP_STATUS_LOADING:int = 1;
 		private var APP_STATUS_RUNNING:int = 2;
@@ -74,13 +76,16 @@
 		private var ztColors:Array = [ 0xff0000, 0x00ff00, 0x00ffff ];
 		
 		// Sprite used as a template to clone new ones
-		public static var sp:MyBaseSprite;
+		public static var sp:/*MyBase*/Sprite;
 
 		private var bsBase:MyBaseSprite;
 		
 		private var leftPressed:Boolean, rightPressed:Boolean, upPressed:Boolean, downPressed:Boolean, downReleased:Boolean;
 		
 		private var gameover:GameOver = null;
+		
+		[Embed(source = "../assets/isidro-32.png")]
+		private var isidro:Class;
 		
 		public function done():Canvas
 		{
@@ -91,7 +96,14 @@
         {
 			appStatus = APP_STATUS_LOADING;
     	
-			sp = new MyBaseSprite();
+			//sp = new MyBaseSprite();
+			
+			sp = new Sprite();
+			var displayObj:DisplayObject = new isidro();
+			displayObj.x = -displayObj.width>>1;
+			displayObj.y = -displayObj.height>>1;
+			sp.addChild(displayObj);
+			
 			//sp.graphics.beginFill(0xff0000);
 			//sp.graphics.drawRoundRect(0, 0, 10, 10, 20);
 			//sp.graphics.endFill();
@@ -107,7 +119,7 @@
 			timer.addEventListener(TimerEvent.TIMER, onTimerTick);
 			timer.start();
 			
-			addEventListener(FlexEvent.CREATION_COMPLETE, creationHandler);
+			//addEventListener(FlexEvent.CREATION_COMPLETE, creationHandler);
 			
 			leftPressed = rightPressed = upPressed = downPressed = false;
 			downReleased = true;
@@ -146,7 +158,7 @@
 			switch(appStatus)
 			{
 				case APP_STATUS_LOADING:
-					if (sp.isActive)
+					//if (sp.isActive)
 					{
 						initBoardAndTiles();
 						appStatus = APP_STATUS_RUNNING;
@@ -176,10 +188,11 @@
 			switch(zetriStatus)
 			{
 				case ZETRI_STATUS_MOVING:
-					moveZetrimino();
+					moveZetrimino(elapsedTimer);
 					break;
 				
 				case ZETRI_STATUS_CONSOLIDATING:
+					consolidateZetrimino(elapsedTimer);
 					break;
 					
 			}
@@ -191,12 +204,22 @@
 		}
 
 		
-		private function moveZetrimino():void
+		private function moveZetrimino(elapsedTimer:int):void
 		{
 			zetri.paint(panel);
 			
 			var done:Boolean = zetri.move(board, elapsedTimer, leftPressed, rightPressed, upPressed, downPressed, downReleased);
 			if (done)
+			{
+				zetriStatus = ZETRI_STATUS_CONSOLIDATING;
+				zetriTimer = 0;
+			}
+		}
+		
+		private function consolidateZetrimino(elapsedTimer:int):void
+		{
+			zetriTimer += elapsedTimer;
+			if (zetriTimer >= 200)
 			{
 				zetri.consolidate(board);
 				zetri.unpaint(panel);
@@ -206,7 +229,7 @@
 				
 				zetri = new MyZetrimino(board);
 				zetriStatus = ZETRI_STATUS_MOVING;
-
+	
 				if (!zetri.checkGoodPos(board))
 				{
 					// GAME OVER!
@@ -218,8 +241,9 @@
 				}
 			
 				if (downPressed) downReleased = false;
+				
+				zetriStatus = ZETRI_STATUS_MOVING;
 			}
-				    	
 	    }
 		
 		public function addScore(score:int):void
