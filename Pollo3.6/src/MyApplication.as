@@ -20,7 +20,7 @@
     import mx.events.FlexEvent;
     import mx.graphics.SolidColor;
 
-	//[SWF(width = "1024", height = "768")]
+	[SWF(width = "1024", height = "768")]
 	public class MyApplication extends Canvas
     {
 		private var isActive:Boolean = false;
@@ -194,7 +194,6 @@
 				bs0.addChild(bm1);
 				bs0.x = 0;
 				bs0.y = 0;
-				//bs0.transform.matrix = new Matrix(1, 0, 0, 1, -mybmd2.width>>1, -mybmd2.height>>1);
 
 				panel.rawChildren.addChild(bs0);
 				
@@ -204,8 +203,8 @@
 					var _bm:Bitmap = new Bitmap(mybmd2);
 					_bm.transform.matrix = new Matrix(1, 0, 0, 1, -_bm.width>>1, -_bm.height>>1);
 					_sp.addChild(_bm);
-					_sp.x = 0;//i*30;
-					_sp.y = 0;//i*25;
+					_sp.x = 0;
+					_sp.y = 0;
 					_sp.rotation = (i*18) % 360;
 					
 					var mt:MyTile = new MyTile();

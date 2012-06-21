@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" creationComplete="initApp()" frameRate="30" width="1024" height="768" backgroundColor="red">
-<mx:Canvas id="mainpanel" width="1024" height="768" backgroundColor="blue" horizontalCenter="0" verticalCenter="0">
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="horizontal" creationComplete="initApp()" frameRate="30" width="1280" height="800" backgroundColor="red">
+<mx:Canvas id="mainpanel" width="1024" height="768" backgroundColor="blue" horizontalCenter="0" verticalCenter="0" paddingTop="0" paddingLeft="0">
 	<mx:Script>
 		<![CDATA[
 			public function initApp():void 

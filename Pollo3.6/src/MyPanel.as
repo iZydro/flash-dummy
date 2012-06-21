@@ -21,8 +21,9 @@
 			x = 0;
 			y = 0;
 			title = "Chuck's Pic 3"; 
-			width = 780; 
-			height = 500;
+			width = 1024; 
+			height = 768;
+			setStyle("backgroundColor", 0x00ff00);
 			
 			this.addEventListener(MouseEvent.MOUSE_DOWN, mdown);
 			this.addEventListener(MouseEvent.MOUSE_UP, mup);
@@ -63,8 +64,8 @@
 				x += (mouseX - mx);
 				y += (mouseY - my);
 				
-				if (x < 0) x = 0;
-				if (y < 0) y = 0;
+				//if (x < 0) x = 0;
+				//if (y < 0) y = 0;
 				
 			}
 		}
