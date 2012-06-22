@@ -8,7 +8,7 @@ package
 	{
 		private var tick:int = 1000;
 		private var fasttick:int = 50;
-		private var firsttick:int = -2000;
+		private var firsttick:int = -400;
 		
 		private var shape1:Array =
 		[
@@ -229,7 +229,7 @@ package
 			timer = firsttick;
 			
 			posx = MyApplication.ZT_TILES_X / 2 - 1;
-			posy = 0;
+			posy = -1;
 			
 		}
 		
@@ -272,30 +272,33 @@ package
 				{
 					var spr:Sprite = sprites[y*shape[y].length + x];
 
-					if (shape[y][x] == 1)
+					if ((posy+y) >= 0)
 					{
-						// Pieza
-						spr.x = (posx + x) * MyApplication.ZT_TILES_SIZE + 50;
-						spr.y = (posy + y) * MyApplication.ZT_TILES_SIZE + 50;
-
-						if (!panel.rawChildren.contains(spr))
+						if (shape[y][x] == 1)
 						{
-							panel.rawChildren.addChild(spr);
+							// Pieza
+							spr.x = (posx + x) * MyApplication.ZT_TILES_SIZE + 50;
+							spr.y = (posy + y) * MyApplication.ZT_TILES_SIZE + 50;
+	
+							if (!panel.rawChildren.contains(spr))
+							{
+								panel.rawChildren.addChild(spr);
+							}
 						}
-					}
-					else
-					{
-						// Blanco
-						if (panel.rawChildren.contains(spr))
+						else
 						{
-							panel.rawChildren.removeChild(spr);
+							// Blanco
+							if (panel.rawChildren.contains(spr))
+							{
+								panel.rawChildren.removeChild(spr);
+							}
 						}
 					}
 				}
 			}
 		}
 		
-		public function move(board:MyBoard, elapsed:int, leftPressed:Boolean, rightPressed:Boolean, upPressed:Boolean, downPressed:Boolean, downReleased:Boolean):Boolean
+		public function move(board:MyBoard, elapsed:int, keyboard:MyKeyboard /*leftPressed:Boolean, rightPressed:Boolean, upPressed:Boolean, downPressed:Boolean, downReleased:Boolean*/):Boolean
 		{
 			var VALID:Boolean = false;
 			var INVALID:Boolean = true;
@@ -305,10 +308,10 @@ package
 			var oldx:int = posx;
 			var oldy:int = posy;
 			
-			if(leftPressed) posx--;
-			if(rightPressed) posx++;
+			if(keyboard.left.triggered || keyboard.left.repeated) posx--;
+			if(keyboard.right.triggered || keyboard.right.repeated) posx++;
 			
-			if(upPressed)
+			if(keyboard.up.triggered)
 			{
 				var oldframe:int = frame;
 				frame++;
@@ -322,12 +325,16 @@ package
 				}
 			}
 			
-			if (downPressed && downReleased)
+			// Control of down key. Not based on key repeat, instead on timer and pressed
+			
+			// If dow key is pressed, skip longer wait for first frame
+			if (keyboard.down.triggered || keyboard.down.pressed)
 			{
 				if (timer < 0) timer = fasttick;
 			}
 			
-			var thistick:int = (downPressed && downReleased) ? fasttick : tick;
+			// Select tick time
+			var thistick:int = (keyboard.down.triggered || keyboard.down.pressed) ? fasttick : tick;
 			
 			if (timer >= thistick)
 			{
@@ -384,12 +391,18 @@ package
 			{
 				for (var x:int = 0; x < shape[y].length; x++)
 				{
-					if (shape[y][x] == 1)
+					/*if ((y+posy) < 0)
 					{
-						if ( (x+posx) < 0 || (x+posx >= MyApplication.ZT_TILES_X) ) return false;
-						if ( (y+posy) < 0 || (y+posy >= MyApplication.ZT_TILES_Y) ) return false;
-						
-						if (board.getZininoAt(y+posy, x+posx) == 2) return false;
+					}
+					else*/
+					{
+						if (shape[y][x] == 1)
+						{
+							if ( (x+posx) < 0 || (x+posx >= MyApplication.ZT_TILES_X) ) return false;
+							if ( /*(y+posy) < 0 ||*/ (y+posy >= MyApplication.ZT_TILES_Y) ) return false;
+							
+							if (board.getZininoAt(y+posy, x+posx) == 2) return false;
+						}
 					}
 				}
 			}
@@ -403,64 +416,59 @@ package
 			{
 				for (var x:int = 0; x < shape[y].length; x++)
 				{
-					if (shape[y][x] == 1)
+					if (y+posy >= 0)
 					{
-						var sp:Sprite = new Sprite();//board.getZininoImageAt(y+posy, x+posx);
-						
-						
-						var bm:Bitmap;
-						
-						// Create class
-						var mbm:MyBitmap = new MyBitmap();
-						
-						// Create bitmap data to be copied
-						//var mybmd:BitmapData = mbm.createBitmapData(bsBase.width, bsBase.height, bsBase);
-						var mybmd:BitmapData = mbm.createBitmapData(MyApplication.ZT_TILES_SIZE, MyApplication.ZT_TILES_SIZE, MyApplication.sp);
-						
-						// Fetch bitmap data to bitmap
-						bm = mbm.createBitmap();
-						bm.x = 0;//size_tile >> 1;
-						bm.y = 0;//size_tile >> 1;
-						
-						// And add it to the Sprite holder
-						sp.addChild(bm);
-						
-						
-						sp.visible = true;
-/*						
-						sp.graphics.beginFill(0xff0000);
-						sp.graphics.drawRoundRect(0, 0, MyApplication.ZT_TILES_SIZE, MyApplication.ZT_TILES_SIZE, 32);
-						sp.graphics.endFill();
-*/						
-						sp.x =  (x+posx) * MyApplication.ZT_TILES_SIZE + 50;
-						sp.y =  (y+posy) * MyApplication.ZT_TILES_SIZE + 50;
-						
-						// Create the MyZydroSprite
-						var myz:MyZydroSprite = new MyZydroSprite(sp);
-						myz.setX( (x+posx) * MyApplication.ZT_TILES_SIZE + 50);
-						myz.setY( (y+posy) * MyApplication.ZT_TILES_SIZE + 50);
-						//myz.update();
-						
-						// Set the new image
-						
-						var sp_behind:MyZydroSprite = board.getZininoImageAt(y+posy, x+posx);
-						if (sp_behind == null)
+						if (shape[y][x] == 1)
 						{
-							// There was a Zinino there already
-							board.setZininoImageAt(y+posy, x+posx, myz);
-							board.boardPanel.rawChildren.addChild(myz.getSprite());
+							var sp:Sprite = new Sprite();//board.getZininoImageAt(y+posy, x+posx);
 							
-							// Set the logical piece
-							board.setZininoAt(y+posy, x+posx, 2);
+							
+							var bm:Bitmap;
+							
+							// Create class
+							var mbm:MyBitmap = new MyBitmap();
+							
+							// Create bitmap data to be copied
+							//var mybmd:BitmapData = mbm.createBitmapData(bsBase.width, bsBase.height, bsBase);
+							var mybmd:BitmapData = mbm.createBitmapData(MyApplication.ZT_TILES_SIZE, MyApplication.ZT_TILES_SIZE, MyApplication.sp);
+							
+							// Fetch bitmap data to bitmap
+							bm = mbm.createBitmap();
+							bm.x = 0;//size_tile >> 1;
+							bm.y = 0;//size_tile >> 1;
+							
+							// And add it to the Sprite holder
+							sp.addChild(bm);
+							
+							
+							sp.visible = true;
+	/*						
+							sp.graphics.beginFill(0xff0000);
+							sp.graphics.drawRoundRect(0, 0, MyApplication.ZT_TILES_SIZE, MyApplication.ZT_TILES_SIZE, 32);
+							sp.graphics.endFill();
+	*/						
+							sp.x =  (x+posx) * MyApplication.ZT_TILES_SIZE + 50;
+							sp.y =  (y+posy) * MyApplication.ZT_TILES_SIZE + 50;
+							
+							// Create the MyZydroSprite
+							var myz:MyZydroSprite = new MyZydroSprite(sp);
+							myz.setX( (x+posx) * MyApplication.ZT_TILES_SIZE + 50);
+							myz.setY( (y+posy) * MyApplication.ZT_TILES_SIZE + 50);
+							//myz.update();
+							
+							// Set the new image
+							
+							var sp_behind:MyZydroSprite = board.getZininoImageAt(y+posy, x+posx);
+							if (sp_behind == null)
+							{
+								// There was a Zinino there already
+								board.setZininoImageAt(y+posy, x+posx, myz);
+								board.boardPanel.rawChildren.addChild(myz.getSprite());
+								
+								// Set the logical piece
+								board.setZininoAt(y+posy, x+posx, 2);
+							}
 						}
-
-/*						
-						var sp:Sprite = board.getZininoImageAt(y+posy, x+posx);
-						sp.visible = true;
-						sp.graphics.beginFill(0x000000);
-						sp.graphics.drawRoundRect(0, 0, MyApplication.ZT_TILES_SIZE, MyApplication.ZT_TILES_SIZE, 32);
-						sp.graphics.endFill();
-*/						
 					}
 				}
 			}

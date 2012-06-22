@@ -187,6 +187,45 @@ package
 			
 		}
 		
+		public function checkGravity():void
+		{
+			var y:int = size_y-1; // We start from the bottom line
+			while (y >= 0)
+			{
+				var complete:Boolean = true;
+				for (var x:int = 0; x < size_x; x++)
+				{
+					if (getZininoAt(y, x) == 2) complete = false; 
+				}
+				
+				if (complete)
+				{
+					// Move down all the zininos that are located over this line
+					var anydown:Boolean = false;
+					
+					for (var my:int = y-1; my >= -1; my--)
+					{
+						for (var mx:int = 0; mx < size_x; mx++)
+						{
+							setZininoAt(my+1, mx, my < 0 ? 0 : getZininoAt(my, mx));
+							
+							var sp:MyZydroSprite = getZininoImageAt(my, mx);
+							if (sp != null)
+							{
+								sp.setNewY(sp.getNewY() + MyApplication.ZT_TILES_SIZE);
+								anydown = true;
+							}
+							setZininoImageAt(my+1, mx, sp);
+							setZininoImageAt(my, mx, null);
+						}
+					}
+					// If a line felt, we keep the line pointer at the same line.
+					if (anydown) y++;
+				}
+				y--;
+			}	
+		}
+			
 		public function checkCompleteLines():void
 		{
 			var y:int = size_y-1; // We start from the bottom line
@@ -208,56 +247,9 @@ package
 						var sp2clear:Sprite = getZininoImageAt(y, cx).getSprite();
 						boardPanel.rawChildren.removeChild(sp2clear);
 						setZininoImageAt(y, cx, null);
-						
-/*						
-						var sp:Sprite = getZininoImageAt(y, cx);
-						sp.visible = false;
-						sp.graphics.beginFill(0xffffff);
-						sp.graphics.drawRoundRect(0, 0, MyApplication.ZT_TILES_SIZE, MyApplication.ZT_TILES_SIZE, 32);
-						sp.graphics.endFill();
-*/						
-						
-					}
-					
-					// Move down all the zininos up to this line
-					for (var my:int = y-1; my >= -1; my--)
-					{
-						for (var mx:int = 0; mx < size_x; mx++)
-						{
-							setZininoAt(my+1, mx, my < 0 ? 0 : getZininoAt(my, mx));
-							
-							//var tile:int = my < 0 ? 0 : getZininoAt(my, mx);
-							
-							var sp:MyZydroSprite = getZininoImageAt(my, mx);
-							if (sp != null)
-							{
-								sp.setNewY(sp.getNewY() + MyApplication.ZT_TILES_SIZE);
-								//sp.update();
-							}
-							setZininoImageAt(my+1, mx, sp);
-							setZininoImageAt(my, mx, null);
-							
-							
-/*							
-							var sp1:Sprite = getZininoImageAt(my+1, mx);
-							sp1.visible = (tile == 2);
-							sp1.graphics.beginFill(tile == 2 ? 0x0 : 0xffffff);
-							sp1.graphics.drawRoundRect(0, 0, MyApplication.ZT_TILES_SIZE, MyApplication.ZT_TILES_SIZE, 32);
-							sp1.graphics.endFill();
-*/							
-
-							/*var sp2:Sprite = getZininoImageAt(my+1, mx);
-							sp2.graphics.beginFill(0xffffff);
-							sp2.graphics.drawRoundRect(0, 0, MyApplication.ZT_TILES_SIZE, MyApplication.ZT_TILES_SIZE, 32);
-							sp2.graphics.endFill();*/
-							
-						}
 					}
 				}
-				else
-				{
-					y--;
-				}
+				y--;
 			}	
 		}
 	}

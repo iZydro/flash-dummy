@@ -34,6 +34,7 @@
 		
 		private var ZETRI_STATUS_MOVING:int = 1;
 		private var ZETRI_STATUS_CONSOLIDATING:int = 2;
+		private var ZETRI_STATUS_GRAVITING:int = 3;
 		
 		private var zetriStatus:int;
 		private var zetriTimer:int;
@@ -80,7 +81,7 @@
 
 		private var bsBase:MyBaseSprite;
 		
-		private var leftPressed:Boolean, rightPressed:Boolean, upPressed:Boolean, downPressed:Boolean, downReleased:Boolean;
+		private var keyboard:MyKeyboard;
 		
 		private var gameover:GameOver = null;
 		
@@ -121,8 +122,12 @@
 			
 			//addEventListener(FlexEvent.CREATION_COMPLETE, creationHandler);
 			
-			leftPressed = rightPressed = upPressed = downPressed = false;
-			downReleased = true;
+			keyboard = new MyKeyboard();
+			
+			// Specific values for down
+			keyboard.down.setRepeatDelay(100);
+			keyboard.down.setRepeatRate(75);
+			
 			gameover = null;
 			
 		}
@@ -155,6 +160,8 @@
 			elapsedTimer = now - currentTimer;
 			currentTimer = now;
 			
+			keyboard.processKeyboard(elapsedTimer);
+			
 			switch(appStatus)
 			{
 				case APP_STATUS_LOADING:
@@ -167,6 +174,7 @@
 				
 				case APP_STATUS_RUNNING:
 					runGame();
+					break;
 			}
 		}
 		
@@ -180,7 +188,7 @@
 					gameover = null;
 
 					// Clear keyboard
-					leftPressed = rightPressed = upPressed = downPressed = false;
+					keyboard.clear();
 				}
 				return;
 			}
@@ -193,20 +201,18 @@
 				
 				case ZETRI_STATUS_CONSOLIDATING:
 					consolidateZetrimino(elapsedTimer);
-					if (downPressed) downReleased = false;
+					break;
+				
+				case ZETRI_STATUS_GRAVITING:
+					gravityZetriminos(elapsedTimer);
 					break;
 					
 			}
 			
 			// Update Zetriminos animation
-			
 			board.updateZetriminos();
 
-			// Clear keyboard
-			
-			leftPressed = rightPressed = upPressed = downPressed = false;
-			
-			panel.setTitle("Elapsed: " + elapsedTimer);
+			panel.setTitle("Elapsed:" + elapsedTimer /*+ " dP:" + downPressed + " dR:" + downReleased*/);
 		}
 
 		
@@ -214,12 +220,41 @@
 		{
 			zetri.paint(panel);
 			
-			var done:Boolean = zetri.move(board, elapsedTimer, leftPressed, rightPressed, upPressed, downPressed, downReleased);
+			var done:Boolean = zetri.move(board, elapsedTimer, keyboard);
 			if (done)
 			{
 				zetriStatus = ZETRI_STATUS_CONSOLIDATING;
 				zetriTimer = 0;
 			}
+		}
+
+		private function gravityZetriminos(elapsedTimer:int):void
+		{
+			zetriTimer += elapsedTimer;
+			if (zetriTimer >= 200)
+			{
+				board.checkGravity();
+				
+				zetri = new MyZetrimino(board);
+				zetriStatus = ZETRI_STATUS_MOVING;
+				
+				if (!zetri.checkGoodPos(board))
+				{
+					// GAME OVER!
+					zetri.consolidate(board);
+					zetri.paint(panel);
+					zetri.unpaint(panel);
+					zetri = null;
+					gameover = new GameOver();
+				}
+				
+				if (keyboard.down.pressed)
+				{
+					keyboard.down.clear();
+					keyboard.down.force_release();
+				}
+			}
+			
 		}
 		
 		private function consolidateZetrimino(elapsedTimer:int):void
@@ -233,19 +268,8 @@
 				
 				board.checkCompleteLines();
 				
-				zetri = new MyZetrimino(board);
-				zetriStatus = ZETRI_STATUS_MOVING;
-	
-				if (!zetri.checkGoodPos(board))
-				{
-					// GAME OVER!
-					zetri.consolidate(board);
-					zetri.paint(panel);
-					zetri.unpaint(panel);
-					zetri = null;
-					gameover = new GameOver();
-				}
-				zetriStatus = ZETRI_STATUS_MOVING;
+				zetriStatus = ZETRI_STATUS_GRAVITING;
+				zetriTimer = 0;
 			}
 	    }
 		
@@ -282,48 +306,15 @@
 
 		public function addedApp():void
 		{
-			stage.addEventListener(KeyboardEvent.KEY_DOWN, keyPressedDown);
-			stage.addEventListener(KeyboardEvent.KEY_UP, keyPressedUp);
+			keyboard.setCallbacks(this);
+			//stage.addEventListener(KeyboardEvent.KEY_DOWN, keyPressedDown);
+			//stage.addEventListener(KeyboardEvent.KEY_UP, keyPressedUp);
 		}
 		
         private function handleClick(e:MouseEvent):void
         {
             Alert.show("You clicked it!", "Clickity!");
         }
-		
-		private function keyPressedUp(event:KeyboardEvent):void
-		{
-			var key:uint = event.keyCode;
-			
-			switch (key)
-			{
-				case Keyboard.DOWN:
-					downReleased = true;
-					break;
-			}
-			
-		}
-			
-		private function keyPressedDown(event:KeyboardEvent):void
-		{
-			var key:uint = event.keyCode;
-		
-			switch (key)
-			{
-				case Keyboard.LEFT :
-					leftPressed = true;
-					break;
-				case Keyboard.RIGHT :
-					rightPressed = true;
-					break;
-				case Keyboard.UP :
-					upPressed = true;
-					break;
-				case Keyboard.DOWN :
-					downPressed = true;
-					break;
-			}
-		}
-        
+
     }
 }
