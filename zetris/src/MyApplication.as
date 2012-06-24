@@ -32,6 +32,11 @@
 		public static var ZT_TILES_Y:int = 12;
 		public static var ZT_TILES_SIZE:int = 32;
 		
+		public static var APP_STATUS_LOADING:int   = 1;
+		public static var APP_STATUS_MAIN_MENU:int = 2;
+		public static var APP_STATUS_RUNNING:int   = 3;
+		public static var APP_STATUS_GAME_OVER:int = 4;
+		
 		private var ZETRI_STATUS_MOVING:int = 1;
 		private var ZETRI_STATUS_CONSOLIDATING:int = 2;
 		private var ZETRI_STATUS_GRAVITING:int = 3;
@@ -39,8 +44,6 @@
 		private var zetriStatus:int;
 		private var zetriTimer:int;
 		
-		private var APP_STATUS_LOADING:int = 1;
-		private var APP_STATUS_RUNNING:int = 2;
 		private var appStatus:int;
 		
 		private var isActive:Boolean = false;
@@ -48,7 +51,10 @@
 		private static var myLoader:Loader;
 		private static var canvas:MyCanvas;
 		
+		private var mainMenu:MyMainMenu;
+		
 		private var panel:MyPanel;
+		private var menuCanvas:Canvas;
 		    	
 		private static var basiclayout:MyBasicLayout;
 
@@ -82,6 +88,7 @@
 		private var bsBase:MyBaseSprite;
 		
 		private var keyboard:MyKeyboard;
+		private var zetriminos:MyZetriminosDefinitions;
 		
 		private var gameover:GameOver = null;
 		
@@ -97,20 +104,12 @@
         {
 			appStatus = APP_STATUS_LOADING;
     	
-			//sp = new MyBaseSprite();
-			
 			sp = new Sprite();
 			var displayObj:DisplayObject = new isidro();
 			displayObj.x = -displayObj.width>>1;
 			displayObj.y = -displayObj.height>>1;
 			sp.addChild(displayObj);
 			
-			//sp.graphics.beginFill(0xff0000);
-			//sp.graphics.drawRoundRect(0, 0, 10, 10, 20);
-			//sp.graphics.endFill();
-			
-			x=0;
-			y=0;
 			panel = new MyPanel();
 			this.addChild(panel);
 
@@ -124,9 +123,19 @@
 			
 			keyboard = new MyKeyboard();
 			
-			// Specific values for down
+			// Specific values for down key
 			keyboard.down.setRepeatDelay(100);
 			keyboard.down.setRepeatRate(75);
+			
+			zetriminos = new MyZetriminosDefinitions();
+
+			menuCanvas = new Canvas();
+			menuCanvas.x = 400;
+			menuCanvas.y = 80;
+			menuCanvas.height = 300;
+			menuCanvas.width = 200;
+			menuCanvas.setStyle("backgroundColor",0x00ff00);			
+			panel.rawChildren.addChild(menuCanvas);
 			
 			gameover = null;
 			
@@ -136,7 +145,7 @@
 		{
 			board = new MyBoard(ZT_TILES_Y, ZT_TILES_X, ZT_TILES_SIZE, panel, sp);
 
-			zetri = new MyZetrimino(board);
+			zetri = new MyZetrimino(board, zetriminos);
 			zetriStatus = ZETRI_STATUS_MOVING;
 	
 		}
@@ -149,7 +158,7 @@
 
 			board.deleteZininos();
 			
-			zetri = new MyZetrimino(board);
+			zetri = new MyZetrimino(board, zetriminos);
 			zetriStatus = ZETRI_STATUS_MOVING;
 
 		}
@@ -161,38 +170,58 @@
 			currentTimer = now;
 			
 			keyboard.processKeyboard(elapsedTimer);
-			
+
+			// State machine
 			switch(appStatus)
 			{
 				case APP_STATUS_LOADING:
 					//if (sp.isActive)
 					{
 						initBoardAndTiles();
-						appStatus = APP_STATUS_RUNNING;
+						mainMenu = new MyMainMenu(menuCanvas);
+						appStatus = APP_STATUS_MAIN_MENU;
+					}
+					break;
+				
+				case APP_STATUS_MAIN_MENU:
+					var menuResult:int = mainMenu.process(); 
+					if (menuResult != 0)
+					{
+						appStatus = menuResult;
+						
+						mainMenu.clear();
+						mainMenu = null;
+
+						// Clear keyboard
+						keyboard.clear();
+						
+						// Restore focus to MyApplication
+						stage.focus = this
 					}
 					break;
 				
 				case APP_STATUS_RUNNING:
 					runGame();
 					break;
+				
+				case APP_STATUS_GAME_OVER:
+					//board.deleteOneZinino();
+					board.updateZetriminos();
+					if (gameover.process(elapsedTimer, panel, board))
+					{
+						initGame();
+						gameover = null;
+						
+						mainMenu = new MyMainMenu(menuCanvas);
+						appStatus = APP_STATUS_MAIN_MENU;
+					}
+					break;
+				
 			}
 		}
 		
 		private function runGame():void
 		{
-			if (gameover)
-			{
-				if (gameover.process(elapsedTimer, panel, board))
-				{
-					initGame();
-					gameover = null;
-
-					// Clear keyboard
-					keyboard.clear();
-				}
-				return;
-			}
-			
 			switch(zetriStatus)
 			{
 				case ZETRI_STATUS_MOVING:
@@ -223,8 +252,17 @@
 			var done:Boolean = zetri.move(board, elapsedTimer, keyboard);
 			if (done)
 			{
-				zetriStatus = ZETRI_STATUS_CONSOLIDATING;
-				zetriTimer = 0;
+				switch (zetri.getStatus())
+				{
+					case MyZetrimino.ZETRIMINO_STATUS_FREE:
+						zetri.setStatus(MyZetrimino.ZETRIMINO_STATUS_LANDED);
+						break;
+					
+					case MyZetrimino.ZETRIMINO_STATUS_LANDING:
+						zetriStatus = ZETRI_STATUS_CONSOLIDATING;
+						zetriTimer = 0;
+						break;
+				}
 			}
 		}
 
@@ -235,7 +273,7 @@
 			{
 				board.checkGravity();
 				
-				zetri = new MyZetrimino(board);
+				zetri = new MyZetrimino(board, zetriminos);
 				zetriStatus = ZETRI_STATUS_MOVING;
 				
 				if (!zetri.checkGoodPos(board))
@@ -246,6 +284,7 @@
 					zetri.unpaint(panel);
 					zetri = null;
 					gameover = new GameOver();
+					appStatus = APP_STATUS_GAME_OVER;
 				}
 				
 				if (keyboard.down.pressed)
@@ -260,7 +299,7 @@
 		private function consolidateZetrimino(elapsedTimer:int):void
 		{
 			zetriTimer += elapsedTimer;
-			if (zetriTimer >= 200)
+			if (zetriTimer >= 200 || true)
 			{
 				zetri.consolidate(board);
 				zetri.unpaint(panel);
@@ -301,7 +340,7 @@
 			button.x = panel.width>>1;
 			button.y = panel.height>>1;
             button.addEventListener(MouseEvent.CLICK, handleClick);
-            /*panel.rawChildren.*/addChild( button );
+            addChild( button );
         }
 
 		public function addedApp():void

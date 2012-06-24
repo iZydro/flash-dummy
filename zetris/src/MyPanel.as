@@ -24,13 +24,9 @@
 			width = 780; 
 			height = 500;
 			
-			this.addEventListener(MouseEvent.MOUSE_DOWN, mdown);
+			/*this.addEventListener(MouseEvent.MOUSE_DOWN, mdown);
 			this.addEventListener(MouseEvent.MOUSE_UP, mup);
-			this.addEventListener(MouseEvent.MOUSE_MOVE, mmove);
-			//setStyle("paddingTop", 10); 
-			//setStyle("paddingLeft", 10); 
-			//setStyle("paddingRight",10); 
-			//setStyle("paddingBottom", 10); 
+			this.addEventListener(MouseEvent.MOUSE_MOVE, mmove);*/
 			
 		}
 		

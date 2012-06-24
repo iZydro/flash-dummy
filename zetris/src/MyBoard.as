@@ -94,6 +94,11 @@ package
 		
 		}
 		
+		public function getSizeX():int
+		{
+			return size_x;
+		}
+		
 		public function addTile(spr:Sprite):void
 		{
 			ztBoardTiles.push(spr);			
@@ -111,6 +116,37 @@ package
 				ztBoardTiles.splice(0, 1);				
 			}
 		}
+		
+		
+
+		public function deleteOneZinino():void
+		{
+			var deleted:Boolean = false;
+			var pointer:int = 0;
+			
+			while (pointer < ztBoardImagesZinino.length && !deleted)
+			{
+				var myz:MyZydroSprite = ztBoardImagesZinino[pointer];
+				if (myz != null)
+				{
+					var imgContainer2:Sprite = myz.getSprite();
+					if (imgContainer2 != null)
+					{
+						boardPanel.rawChildren.removeChild(imgContainer2);
+						/*imgContainer2.visible = false;
+						imgContainer2.graphics.beginFill(0xffffff);
+						imgContainer2.graphics.drawRoundRect(0, 0, size_tile, size_tile, 32);
+						imgContainer2.graphics.endFill();
+						boardPanel.rawChildren.removeChild(imgContainer2);
+						imgContainer2 = null;*/
+					}
+					ztBoardImagesZinino[pointer] = null;
+				}
+				pointer++;
+			}
+		}
+		
+		
 		
 		public function getNumTiles():int
 		{

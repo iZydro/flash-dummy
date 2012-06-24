@@ -10,230 +10,46 @@ package
 		private var fasttick:int = 50;
 		private var firsttick:int = -400;
 		
-		private var shape1:Array =
-		[
-			[
-				[0,0,1,0],
-				[0,1,1,0],
-				[0,1,0,0],
-			]
-			,
-			[
-				[0,1,1,0],
-				[0,0,1,1],
-				[0,0,0,0],
-			]
-			,
-			[
-				[0,0,1,0],
-				[0,1,1,0],
-				[0,1,0,0],
-			]
-			,
-			[
-				[0,1,1,0],
-				[0,0,1,1],
-				[0,0,0,0],
-			]
-		]
-		;
-		
-		private var shape2:Array =
-			[
-				[
-					[0,1,0,0],
-					[0,1,1,0],
-					[0,0,1,0],
-				]
-				,
-				[
-					[0,0,1,1],
-					[0,1,1,0],
-					[0,0,0,0],
-				]
-				,
-				[
-					[0,1,0,0],
-					[0,1,1,0],
-					[0,0,1,0],
-				]
-				,
-				[
-					[0,0,1,1],
-					[0,1,1,0],
-					[0,0,0,0],
-				]
-			]
-			;
-		
-		private var shape3:Array =
-		[
-			[
-				[0,0,1,0],
-				[0,0,1,0],
-				[0,1,1,0],
-			]
-			,
-			[
-				[0,1,0,0],
-				[0,1,1,1],
-				[0,0,0,0],
-			]
-			,
-			[
-				[0,1,1,0],
-				[0,1,0,0],
-				[0,1,0,0],
-			]
-			,
-			[
-				[0,1,1,1],
-				[0,0,0,1],
-				[0,0,0,0],
-			]
-		]
-		;
-		
-		private var shape4:Array =
-			[
-				[
-					[0,1,0,0],
-					[0,1,0,0],
-					[0,1,1,0],
-				]
-				,
-				[
-					[0,1,1,1],
-					[0,1,0,0],
-					[0,0,0,0],
-				]
-				,
-				[
-					[0,1,1,0],
-					[0,0,1,0],
-					[0,0,1,0],
-				]
-				,
-				[
-					[0,0,0,1],
-					[0,1,1,1],
-					[0,0,0,0],
-				]
-			]
-			;
-		
-		private var shape5:Array =
-			[
-				[
-					[0,1,1,0],
-					[0,1,1,0],
-					[0,0,0,0],
-				]
-				,
-				[
-					[0,1,1,0],
-					[0,1,1,0],
-					[0,0,0,0],
-				]
-				,
-				[
-					[0,1,1,0],
-					[0,1,1,0],
-					[0,0,0,0],
-				]
-				,
-				[
-					[0,1,1,0],
-					[0,1,1,0],
-					[0,0,0,0],
-				]
-			]
-			;
-		
-		private var shape6:Array =
-			[
-				[
-					[1,1,1,1],
-					[0,0,0,0],
-					[0,0,0,0],
-					[0,0,0,0],
-				]
-				,
-				[
-					[0,1,0,0],
-					[0,1,0,0],
-					[0,1,0,0],
-					[0,1,0,0],
-				]
-				,
-				[
-					[1,1,1,1],
-					[0,0,0,0],
-					[0,0,0,0],
-					[0,0,0,0],
-				]
-				,
-				[
-					[0,1,0,0],
-					[0,1,0,0],
-					[0,1,0,0],
-					[0,1,0,0],
-				]
-			]
-			;
-		
-		private var shape7:Array =
-			[
-				[
-					[0,1,1,1],
-					[0,0,1,0],
-					[0,0,0,0],
-				]
-				,
-				[
-					[0,0,0,1],
-					[0,0,1,1],
-					[0,0,0,1],
-				]
-				,
-				[
-					[0,0,0,0],
-					[0,0,1,0],
-					[0,1,1,1],
-				]
-				,
-				[
-					[0,1,0,0],
-					[0,1,1,0],
-					[0,1,0,0],
-				]
-			]
-			;
+		// Time that a Zetrimino can move after having landed
+		private var time_move_landed:int = 500;
 		
 		private var shape:Array;
 		private var shapeTile:Array;
-		
-		private var shapes:Array = new Array;
+		private var shapeColor:int;
 		
 		private var sprites:Array = new Array;
+
+		// Data related to the Zetrimino logic
 		
 		private var posx:int, posy:int;
+		
+		// pos_faked_x is the x original coordinate after faking it to permit to rotate the Zetriminos near a wall
+		// After rotate is pressed, the game will try to use the real x again instead of the faked position
+		// If a rotation makes a piece go out of bounds, the game will try to change the x position and will keep a copy on pos_faked_x
+		private var pos_faked_x:int;
+		
 		private var frame:int;
 		
 		private var timer:int;
 		
-		public function MyZetrimino(board:MyBoard)
+		public static var ZETRIMINO_STATUS_FREE:int = 0;
+		public static var ZETRIMINO_STATUS_LANDED:int = 1;
+		public static var ZETRIMINO_STATUS_LANDING:int = 2;
+		
+		private var status:int;
+		
+		public function MyZetrimino(board:MyBoard, zetriminos:MyZetriminosDefinitions)
 		{
+			var shapes:Array = new Array;
+			shapes = zetriminos.getZetriminosShapes();
 			
-			shapes.push(shape1);
-			shapes.push(shape2);
-			shapes.push(shape3);
-			shapes.push(shape4);
-			shapes.push(shape5);
-			shapes.push(shape6);
-			shapes.push(shape7);
+			var colors:Array = new Array;
+			colors = zetriminos.getZetriminosColors();
 			
-			shapeTile = shapes[Math.floor(Math.random()*(shapes.length))];
+			var tile:int = Math.floor(Math.random()*(shapes.length));
+			shapeTile = shapes[tile];
+			shapeColor = colors[tile];
+			
 			frame = 0; // Math.floor(Math.random()*(shapeTile.length));
 			shape = shapeTile[frame];
 			
@@ -242,8 +58,9 @@ package
 				for (var x:int = 0; x < shape[y].length; x++)
 				{
 					var imgContainer1:Sprite = new Sprite();
-					imgContainer1.graphics.beginFill(0x0000ff);
-					imgContainer1.graphics.drawRoundRect(0, 0, MyApplication.ZT_TILES_SIZE, MyApplication.ZT_TILES_SIZE, 20);
+					imgContainer1.graphics.beginFill(shapeColor);
+					imgContainer1.graphics.lineStyle(1,0x00ff00);
+					imgContainer1.graphics.drawRect(0, 0, MyApplication.ZT_TILES_SIZE, MyApplication.ZT_TILES_SIZE);
 					imgContainer1.graphics.endFill();
 					imgContainer1.x = x * MyApplication.ZT_TILES_SIZE + 50;
 					imgContainer1.y = y * MyApplication.ZT_TILES_SIZE + 50;
@@ -257,8 +74,11 @@ package
 			
 			timer = firsttick;
 			
-			posx = MyApplication.ZT_TILES_X / 2 - 2;
+			posx = board.getSizeX() / 2 - 2;
+			pos_faked_x = posx;
 			posy = 0;
+			
+			status = ZETRIMINO_STATUS_FREE;
 			
 		}
 		
@@ -277,6 +97,16 @@ package
 			return shape;			
 		}
 		
+		public function getStatus():int
+		{
+			return status;
+		}
+		
+		public function setStatus(the_status:int):void
+		{
+			status = the_status;
+		}
+		
 		public function unpaint(panel:MyPanel):void
 		{
 			for (var i:int = 0; i < sprites.length; i++)
@@ -285,10 +115,6 @@ package
 				{
 					var imgContainer1:Sprite = sprites[i];
 					panel.rawChildren.removeChild(imgContainer1);
-					
-					/*imgContainer1.graphics.beginFill(0x000000);
-					imgContainer1.graphics.drawRoundRect(0, 0, MyApplication.ZT_TILES_SIZE, MyApplication.ZT_TILES_SIZE, 20);
-					imgContainer1.graphics.endFill();*/
 				}
 			}
 		}
@@ -327,8 +153,15 @@ package
 			}
 		}
 		
-		public function move(board:MyBoard, elapsed:int, keyboard:MyKeyboard /*leftPressed:Boolean, rightPressed:Boolean, upPressed:Boolean, downPressed:Boolean, downReleased:Boolean*/):Boolean
+		public function move(board:MyBoard, elapsed:int, keyboard:MyKeyboard):Boolean
 		{
+			
+			if (status == MyZetrimino.ZETRIMINO_STATUS_LANDED)
+			{
+				status = MyZetrimino.ZETRIMINO_STATUS_LANDING;
+				timer = 0;
+			}
+			
 			var VALID:Boolean = false;
 			var INVALID:Boolean = true;
 			
@@ -337,20 +170,61 @@ package
 			var oldx:int = posx;
 			var oldy:int = posy;
 			
-			if(keyboard.left.triggered || keyboard.left.repeated) posx--;
-			if(keyboard.right.triggered || keyboard.right.repeated) posx++;
+			if(keyboard.left.triggered || keyboard.left.repeated)  
+			{
+				posx--;
+				pos_faked_x = posx;
+			}
+			
+			if(keyboard.right.triggered || keyboard.right.repeated)
+			{
+				posx++;
+				pos_faked_x = posx;
+			}
 			
 			if(keyboard.up.triggered)
 			{
+				// Let's use the original x not being faked first!
+				
+				posx = pos_faked_x;
+				
 				var oldframe:int = frame;
 				frame++;
 				frame %= shapeTile.length;
 				shape = shapeTile[frame];
 				if (!checkGoodPos(board))
 				{
-					// Si no cabe, anulamos el giro
-					frame = oldframe;
-					shape = shapeTile[frame];
+					// The Zetrimino did not fit after rotating
+					
+					// Let's try to fake the x position. Twice...
+					
+					pos_faked_x = posx;
+
+					var found:Boolean = false;
+					var counter:int = 0;
+					while (counter < 2 && !found)
+					{
+						if (posx >= (board.getSizeX()>>1))
+						{
+							posx--;
+						}
+						else
+						{
+							posx++;
+						}
+						
+						if (checkGoodPos(board))
+						{
+							found = true;
+						}
+						counter++;
+					}
+					if (!found)
+					{
+						posx = pos_faked_x;
+						frame = oldframe;
+						shape = shapeTile[frame];
+					}
 				}
 			}
 			
@@ -363,7 +237,19 @@ package
 			}
 			
 			// Select tick time
-			var thistick:int = (keyboard.down.triggered || keyboard.down.pressed) ? fasttick : tick;
+			
+			var thistick:int = tick;
+			if (keyboard.down.triggered || keyboard.down.pressed)
+			{
+				thistick = fasttick; 
+			}
+			
+			if (status == MyZetrimino.ZETRIMINO_STATUS_LANDING)
+			{
+				thistick = time_move_landed;
+			}
+			
+			//var thistick:int = (keyboard.down.triggered || keyboard.down.pressed) ? fasttick : tick;
 			
 			if (timer >= thistick)
 			{
@@ -374,31 +260,45 @@ package
 			var newx:int = posx;
 			var newy:int = posy;
 
-			if (oldx == newx && oldy == newy) return false; 
-			
-			if (checkGoodPos(board))
+			if (oldx == newx && oldy == newy)
 			{
+				// Did not even try to move
 				return VALID;
 			}
 			
-			// No hay hueco, probamos primero solo Y
-			posx = oldx;
-			posy = newy;
+			// If we are here, it means that the Zetrimino wanted to move
+			
 			if (checkGoodPos(board))
 			{
+				zetriFree(oldy, newy);
 				return VALID;
 			}
-			else
+			
+			// No ha cabido, probamos primero solo Y si ha habido movimiento en Y
+			
+			if (oldy != newy)
 			{
-				if (newy != oldy)
+				posx = oldx;
+				posy = newy;
+				if (checkGoodPos(board))
 				{
-					// Hemos tocado suelo!!!
-					posx = oldx;
-					posy = oldy;
-					return INVALID;
+					zetriFree(oldy, newy);
+					return VALID;
+				}
+				else
+				{
+					if (newy != oldy)
+					{
+						// Hemos tocado suelo!!!
+						posx = oldx;
+						posy = oldy;
+						return INVALID;
+					}
+					return VALID;
 				}
 			}
 			
+			// Check only X
 			posx = newx;
 			posy = oldy;
 			if (!checkGoodPos(board))
@@ -411,6 +311,21 @@ package
 			return VALID;
 		}
 		
+
+		private function zetriFree(oldy:int, newy:int):void
+		{
+			// If moved and was good in landing mode, give more time to move
+			if (status == MyZetrimino.ZETRIMINO_STATUS_LANDING)
+			{
+				timer = 0;
+				//if (oldy != newy)
+				{
+					// If it moved in X, back to normal mode
+					status = MyZetrimino.ZETRIMINO_STATUS_FREE;
+				}
+			}
+
+		}
 		
 		public function checkGoodPos(board:MyBoard):Boolean
 		{
