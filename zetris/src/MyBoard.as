@@ -56,10 +56,16 @@ package
 					imgContainer1.addChild(bm);
 */					
 					// Draw a standard shape on the sprite
+					
+					imgContainer1.graphics.beginFill(0xffffff);
+					imgContainer1.graphics.lineStyle(1, 0x000000);
+					imgContainer1.graphics.drawRect(0, 0, MyApplication.ZT_TILES_SIZE, MyApplication.ZT_TILES_SIZE);
+					imgContainer1.graphics.endFill();
+/*					
 					imgContainer1.graphics.beginFill(0xff0000);
 					imgContainer1.graphics.drawRoundRect(0, 0, size_tile, size_tile, 20);
 					imgContainer1.graphics.endFill();
-					
+*/					
 					// Place it at its x and y position
 					imgContainer1.x = x*size_tile + 50;
 					imgContainer1.y = y*size_tile + 50;
