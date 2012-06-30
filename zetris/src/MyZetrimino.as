@@ -16,6 +16,7 @@ package
 		private var shape:Array;
 		private var shapeTile:Array;
 		private var shapeColor:int;
+		private var shapeType:int;
 		
 		private var sprites:Array = new Array;
 
@@ -47,8 +48,9 @@ package
 			colors = zetriminos.getZetriminosColors();
 			
 			var tile:int = Math.floor(Math.random()*(shapes.length));
-			shapeTile = shapes[tile];
-			shapeColor = colors[tile];
+			shapeType = tile;
+			shapeTile = shapes[shapeType];
+			shapeColor = colors[shapeType];
 			
 			frame = 0; // Math.floor(Math.random()*(shapeTile.length));
 			shape = shapeTile[frame];
@@ -80,6 +82,11 @@ package
 			
 			status = ZETRIMINO_STATUS_FREE;
 			
+		}
+		
+		public function getType():int
+		{
+			return shapeType;
 		}
 		
 		public function getX():int

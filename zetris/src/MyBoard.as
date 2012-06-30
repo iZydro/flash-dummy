@@ -56,16 +56,11 @@ package
 					imgContainer1.addChild(bm);
 */					
 					// Draw a standard shape on the sprite
-					
 					imgContainer1.graphics.beginFill(0xffffff);
-					imgContainer1.graphics.lineStyle(1, 0x000000);
+					imgContainer1.graphics.lineStyle(1,0x000000);
 					imgContainer1.graphics.drawRect(0, 0, MyApplication.ZT_TILES_SIZE, MyApplication.ZT_TILES_SIZE);
 					imgContainer1.graphics.endFill();
-/*					
-					imgContainer1.graphics.beginFill(0xff0000);
-					imgContainer1.graphics.drawRoundRect(0, 0, size_tile, size_tile, 20);
-					imgContainer1.graphics.endFill();
-*/					
+					
 					// Place it at its x and y position
 					imgContainer1.x = x*size_tile + 50;
 					imgContainer1.y = y*size_tile + 50;
@@ -76,25 +71,7 @@ package
 					// And save the Sprite for further access 
 					ztBoardBackgroundImages.push(imgContainer1);
 					ztBoardImagesZinino.push(null);
-/*					
-					var imgContainer2:Sprite = new Sprite();
 					
-					// Draw a standard shape on the sprite
-					imgContainer2.graphics.beginFill(0xffffff);
-					imgContainer2.graphics.drawRoundRect(0, 0, size_tile, size_tile, 32);
-					imgContainer2.graphics.endFill();
-					
-					// Place it at its x and y position
-					imgContainer2.x = x*size_tile + 50;
-					imgContainer2.y = y*size_tile + 50;
-					
-					// Add it to the panel
-					imgContainer2.visible = false;
-					panel.rawChildren.addChild(imgContainer2);
-					
-					// And save the Sprite for further access 
-					ztBoardImagesZinino.push(imgContainer2);
-*/					
 				}
 			}
 		

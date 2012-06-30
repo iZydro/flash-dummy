@@ -78,6 +78,8 @@
 		private var tiles:Array = new Array;
 		
 		private var board:MyBoard;
+		private var stack:MyZetriminosStack;
+		
 		private var zetri:MyZetrimino;
 		
 		private var ztColors:Array = [ 0xff0000, 0x00ff00, 0x00ffff ];
@@ -127,8 +129,7 @@
 			keyboard.down.setRepeatDelay(100);
 			keyboard.down.setRepeatRate(75);
 			
-			zetriminos = new MyZetriminosDefinitions();
-
+			// Create menu Canvas
 			menuCanvas = new Canvas();
 			menuCanvas.x = 400;
 			menuCanvas.y = 80;
@@ -145,6 +146,9 @@
 		{
 			board = new MyBoard(ZT_TILES_Y, ZT_TILES_X, ZT_TILES_SIZE, panel, sp);
 
+			zetriminos = new MyZetriminosDefinitions();
+			stack = new MyZetriminosStack(board, zetriminos);
+			
 			zetri = new MyZetrimino(board, zetriminos);
 			zetriStatus = ZETRI_STATUS_MOVING;
 	
@@ -241,7 +245,13 @@
 			// Update Zetriminos animation
 			board.updateZetriminos();
 
-			panel.setTitle("Elapsed:" + elapsedTimer /*+ " dP:" + downPressed + " dR:" + downReleased*/);
+			panel.setTitle
+			(
+				"Elapsed:" + elapsedTimer + 
+				" z1: " + stack.getZetriminoAt(0).getType() + 
+				" z2: " + stack.getZetriminoAt(1).getType() +
+				" z3: " + stack.getZetriminoAt(2).getType()
+			);
 		}
 
 		
