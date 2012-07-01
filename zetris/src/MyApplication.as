@@ -149,20 +149,18 @@
 			zetriminos = new MyZetriminosDefinitions();
 			stack = new MyZetriminosStack(board, zetriminos);
 			
-			zetri = new MyZetrimino(board, zetriminos);
-			zetriStatus = ZETRI_STATUS_MOVING;
-	
+			initGame();
 		}
 		
 		private function initGame():void
 		{
-			//while(board.getNumTiles()) board.deleteOneTile(panel);
-			
 			board.deleteBoardImages();
 
 			board.deleteZininos();
 			
-			zetri = new MyZetrimino(board, zetriminos);
+			//zetri = new MyZetrimino(board, zetriminos);
+			zetri = stack.getNextZetrimino();
+			
 			zetriStatus = ZETRI_STATUS_MOVING;
 
 		}
@@ -248,9 +246,9 @@
 			panel.setTitle
 			(
 				"Elapsed:" + elapsedTimer + 
-				" z1: " + stack.getZetriminoAt(0).getType() + 
-				" z2: " + stack.getZetriminoAt(1).getType() +
-				" z3: " + stack.getZetriminoAt(2).getType()
+				" z1:" + stack.getZetriminoAt(0).getType() + 
+				" z2:" + stack.getZetriminoAt(1).getType() +
+				" z3:" + stack.getZetriminoAt(2).getType()
 			);
 		}
 
@@ -283,7 +281,9 @@
 			{
 				board.checkGravity();
 				
-				zetri = new MyZetrimino(board, zetriminos);
+				//zetri = new MyZetrimino(board, zetriminos);
+				zetri = stack.getNextZetrimino();
+				
 				zetriStatus = ZETRI_STATUS_MOVING;
 				
 				if (!zetri.checkGoodPos(board))

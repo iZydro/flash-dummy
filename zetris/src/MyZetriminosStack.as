@@ -15,8 +15,14 @@ package
 		
 		public function getNextZetrimino():MyZetrimino
 		{
-			var zetri:MyZetrimino = stack.pop();
-			fillZetriminos();
+			//var zetri:MyZetrimino = stack.pop();
+			var zetri:MyZetrimino = stack[0];
+			
+			stack[0] = stack[1];
+			stack[1] = stack[2];
+			stack[2] = new MyZetrimino(board, definitions);
+			
+			//fillZetriminos();
 			return(zetri);
 		}
 
