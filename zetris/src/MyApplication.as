@@ -54,6 +54,11 @@
 		private var mainMenu:MyMainMenu;
 		
 		private var panel:MyPanel;
+		private var canvasT1:Canvas;
+		private var canvasT2:Canvas;
+		private var canvasT3:Canvas;
+		
+		private var gameCanvas:Canvas;
 		private var menuCanvas:Canvas;
 		    	
 		private static var basiclayout:MyBasicLayout;
@@ -115,12 +120,6 @@
 			panel = new MyPanel();
 			this.addChild(panel);
 
-			currentTimer = getTimer();
-			
-			timer = new Timer(DELAY);
-			timer.addEventListener(TimerEvent.TIMER, onTimerTick);
-			timer.start();
-			
 			//addEventListener(FlexEvent.CREATION_COMPLETE, creationHandler);
 			
 			keyboard = new MyKeyboard();
@@ -129,22 +128,62 @@
 			keyboard.down.setRepeatDelay(100);
 			keyboard.down.setRepeatRate(75);
 			
+			// Create game Canvas
+			gameCanvas = new Canvas();
+			gameCanvas.x = 50;
+			gameCanvas.y = 50;
+			gameCanvas.height = 400;
+			gameCanvas.width = 300;
+			gameCanvas.setStyle("backgroundColor",0x00ff00);			
+			panel.rawChildren.addChild(gameCanvas);
+
+			
 			// Create menu Canvas
 			menuCanvas = new Canvas();
 			menuCanvas.x = 400;
 			menuCanvas.y = 80;
-			menuCanvas.height = 300;
+			menuCanvas.height = 400;
 			menuCanvas.width = 200;
 			menuCanvas.setStyle("backgroundColor",0x00ff00);			
 			panel.rawChildren.addChild(menuCanvas);
 			
+			canvasT1 = new Canvas();
+			canvasT1.x = 20;
+			canvasT1.y = 20;
+			canvasT1.height = 128;
+			canvasT1.width = 128;
+			canvasT1.setStyle("backgroundColor",0x000000);
+			menuCanvas.addChild(canvasT1);
+			
+			canvasT2 = new Canvas();
+			canvasT2.x = 20;
+			canvasT2.y = 120;
+			canvasT2.height = 128;
+			canvasT2.width = 128;
+			canvasT2.setStyle("backgroundColor",0x222222);
+			menuCanvas.addChild(canvasT2);
+			
+			canvasT3 = new Canvas();
+			canvasT3.x = 20;
+			canvasT3.y = 220;
+			canvasT3.height = 128;
+			canvasT3.width = 128;
+			canvasT3.setStyle("backgroundColor",0x444444);
+			menuCanvas.addChild(canvasT3);
+			
 			gameover = null;
+			
+			currentTimer = getTimer();
+			
+			timer = new Timer(DELAY);
+			timer.addEventListener(TimerEvent.TIMER, onTimerTick);
+			timer.start();
 			
 		}
 		
 		private function initBoardAndTiles():void
 		{
-			board = new MyBoard(ZT_TILES_Y, ZT_TILES_X, ZT_TILES_SIZE, panel, sp);
+			board = new MyBoard(ZT_TILES_Y, ZT_TILES_X, ZT_TILES_SIZE, gameCanvas, sp);
 
 			zetriminos = new MyZetriminosDefinitions();
 			stack = new MyZetriminosStack(board, zetriminos);
@@ -160,6 +199,7 @@
 			
 			//zetri = new MyZetrimino(board, zetriminos);
 			zetri = stack.getNextZetrimino();
+			zetri.setX(board.getSizeX() / 2 - 2);
 			
 			zetriStatus = ZETRI_STATUS_MOVING;
 
@@ -255,7 +295,11 @@
 		
 		private function moveZetrimino(elapsedTimer:int):void
 		{
-			zetri.paint(panel);
+			zetri.paint_(gameCanvas);
+			
+			stack.getZetriminoAt(0).paint_(canvasT1);
+			stack.getZetriminoAt(1).paint_(canvasT2);
+			stack.getZetriminoAt(2).paint_(canvasT3);
 			
 			var done:Boolean = zetri.move(board, elapsedTimer, keyboard);
 			if (done)
@@ -283,6 +327,10 @@
 				
 				//zetri = new MyZetrimino(board, zetriminos);
 				zetri = stack.getNextZetrimino();
+				zetri.setX(board.getSizeX() / 2 - 2);
+
+				// Delete the Zetrimino from the "next" panel
+				zetri.unpaint_(canvasT1);				
 				
 				zetriStatus = ZETRI_STATUS_MOVING;
 				
@@ -290,8 +338,8 @@
 				{
 					// GAME OVER!
 					zetri.consolidate(board);
-					zetri.paint(panel);
-					zetri.unpaint(panel);
+					zetri.paint_(gameCanvas);
+					zetri.unpaint_(gameCanvas);
 					zetri = null;
 					gameover = new GameOver();
 					appStatus = APP_STATUS_GAME_OVER;
@@ -312,7 +360,7 @@
 			if (zetriTimer >= 200 || true)
 			{
 				zetri.consolidate(board);
-				zetri.unpaint(panel);
+				zetri.unpaint_(gameCanvas);
 				zetri = null;
 				
 				board.checkCompleteLines();

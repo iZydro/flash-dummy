@@ -15,18 +15,19 @@ package
 		
 		private var ztBoardTiles:Array = new Array;
 		
-		public var boardPanel:Panel;
+		//public var boardPanel:Panel;
+		public var boardCanvas:Canvas;
 
 		private var size_x:int;
 		private var size_y:int;
 		private var size_tile:int;
 		
-		public function MyBoard(given_y:int, given_x:int, given_tile:int, panel:Panel, bsBase:Sprite)
+		public function MyBoard(given_y:int, given_x:int, given_tile:int, canvas:Canvas, bsBase:Sprite)
 		{
 			size_x = given_x;
 			size_y = given_y;
 			size_tile = given_tile;
-			boardPanel = panel;
+			boardCanvas = canvas;
 			
 			for (var y:int = 0; y < size_y; y++)
 			{
@@ -62,11 +63,11 @@ package
 					imgContainer1.graphics.endFill();
 					
 					// Place it at its x and y position
-					imgContainer1.x = x*size_tile + 50;
-					imgContainer1.y = y*size_tile + 50;
+					imgContainer1.x = x*size_tile;
+					imgContainer1.y = y*size_tile;
 					
 					// Add it to the panel
-					panel.rawChildren.addChild(imgContainer1);
+					canvas.rawChildren.addChild(imgContainer1);
 					
 					// And save the Sprite for further access 
 					ztBoardBackgroundImages.push(imgContainer1);
@@ -115,12 +116,12 @@ package
 					var imgContainer2:Sprite = myz.getSprite();
 					if (imgContainer2 != null)
 					{
-						boardPanel.rawChildren.removeChild(imgContainer2);
+						boardCanvas.removeChild(imgContainer2);
 						/*imgContainer2.visible = false;
 						imgContainer2.graphics.beginFill(0xffffff);
 						imgContainer2.graphics.drawRoundRect(0, 0, size_tile, size_tile, 32);
 						imgContainer2.graphics.endFill();
-						boardPanel.rawChildren.removeChild(imgContainer2);
+						boardCanvas.rawChildren.removeChild(imgContainer2);
 						imgContainer2 = null;*/
 					}
 					ztBoardImagesZinino[pointer] = null;
@@ -185,7 +186,7 @@ package
 						imgContainer2.graphics.beginFill(0xffffff);
 						imgContainer2.graphics.drawRoundRect(0, 0, size_tile, size_tile, 32);
 						imgContainer2.graphics.endFill();
-						boardPanel.rawChildren.removeChild(imgContainer2);
+						boardCanvas.removeChild(imgContainer2);
 						imgContainer2 = null;
 					}
 					ztBoardImagesZinino[i] = null;
@@ -264,7 +265,7 @@ package
 						// Clear the complete line
 						setZininoAt(y, cx, 0);
 						var sp2clear:Sprite = getZininoImageAt(y, cx).getSprite();
-						boardPanel.rawChildren.removeChild(sp2clear);
+						boardCanvas.removeChild(sp2clear);
 						setZininoImageAt(y, cx, null);
 					}
 				}

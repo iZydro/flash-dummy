@@ -4,6 +4,8 @@ package
 	import flash.display.BitmapData;
 	import flash.display.Sprite;
 	
+	import mx.containers.Canvas;
+	
 	public class MyZetrimino
 	{
 		private var tick:int = 1000;
@@ -77,11 +79,19 @@ package
 			timer = firsttick;
 			
 			posx = board.getSizeX() / 2 - 2;
+			
+			posx = 0;
 			pos_faked_x = posx;
 			posy = 0;
 			
 			status = ZETRIMINO_STATUS_FREE;
 			
+		}
+		
+		public function setX(_x:int):void
+		{
+			posx = _x;
+			pos_faked_x = posx;
 		}
 		
 		public function getType():int
@@ -126,6 +136,18 @@ package
 			}
 		}
 		
+		public function unpaint_(canvas:Canvas):void
+		{
+			for (var i:int = 0; i < sprites.length; i++)
+			{
+				if (canvas.rawChildren.contains(sprites[i]))
+				{
+					var imgContainer1:Sprite = sprites[i];
+					canvas.rawChildren.removeChild(imgContainer1);
+				}
+			}
+		}
+		
 		public function paint(panel:MyPanel):void
 		{
 			for (var y:int = 0; y < shape.length; y++)
@@ -153,6 +175,40 @@ package
 							if (panel.rawChildren.contains(spr))
 							{
 								panel.rawChildren.removeChild(spr);
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		public function paint_(canvas:Canvas):void
+		{
+			for (var y:int = 0; y < shape.length; y++)
+			{
+				for (var x:int = 0; x < shape[y].length; x++)
+				{
+					var spr:Sprite = sprites[y*shape[y].length + x];
+					
+					if ((posy+y) >= 0)
+					{
+						if (shape[y][x] == 1)
+						{
+							// Pieza
+							spr.x = (posx + x) * MyApplication.ZT_TILES_SIZE;
+							spr.y = (posy + y) * MyApplication.ZT_TILES_SIZE;
+							
+							if (!canvas.rawChildren.contains(spr))
+							{
+								canvas.rawChildren.addChild(spr);
+							}
+						}
+						else
+						{
+							// Blanco
+							if (canvas.rawChildren.contains(spr))
+							{
+								canvas.rawChildren.removeChild(spr);
 							}
 						}
 					}
@@ -398,13 +454,13 @@ package
 							sp.graphics.drawRoundRect(0, 0, MyApplication.ZT_TILES_SIZE, MyApplication.ZT_TILES_SIZE, 32);
 							sp.graphics.endFill();
 	*/						
-							sp.x =  (x+posx) * MyApplication.ZT_TILES_SIZE + 50;
-							sp.y =  (y+posy) * MyApplication.ZT_TILES_SIZE + 50;
+							sp.x =  (x+posx) * MyApplication.ZT_TILES_SIZE/* + 50*/;
+							sp.y =  (y+posy) * MyApplication.ZT_TILES_SIZE/* + 50*/;
 							
 							// Create the MyZydroSprite
 							var myz:MyZydroSprite = new MyZydroSprite(sp);
-							myz.setX( (x+posx) * MyApplication.ZT_TILES_SIZE + 50);
-							myz.setY( (y+posy) * MyApplication.ZT_TILES_SIZE + 50);
+							myz.setX( (x+posx) * MyApplication.ZT_TILES_SIZE/* + 50*/);
+							myz.setY( (y+posy) * MyApplication.ZT_TILES_SIZE/* + 50*/);
 							//myz.update();
 							
 							// Set the new image
@@ -414,7 +470,7 @@ package
 							{
 								// There was a Zinino there already
 								board.setZininoImageAt(y+posy, x+posx, myz);
-								board.boardPanel.rawChildren.addChild(myz.getSprite());
+								board.boardCanvas.rawChildren.addChild(myz.getSprite());
 								
 								// Set the logical piece
 								board.setZininoAt(y+posy, x+posx, 2);

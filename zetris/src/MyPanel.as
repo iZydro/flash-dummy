@@ -30,6 +30,18 @@
 			
 		}
 		
+		public function setYX(_y:int, _x:int):void
+		{
+			y = _y;
+			x = _x;
+		}
+		
+		public function setHW(_h:int, _w:int):void
+		{
+			height = _h;
+			width = _w;
+		}
+		
 		public function setTitle(_title:String):void
 		{
 			title = _title;
