@@ -32,6 +32,8 @@
 		public static var ZT_TILES_Y:int = 12;
 		public static var ZT_TILES_SIZE:int = 32;
 		
+		public static var ZT_MINITILES_SIZE:int = 16;
+		
 		public static var APP_STATUS_LOADING:int   = 1;
 		public static var APP_STATUS_MAIN_MENU:int = 2;
 		public static var APP_STATUS_RUNNING:int   = 3;
@@ -49,20 +51,15 @@
 		private var isActive:Boolean = false;
 
 		private static var myLoader:Loader;
-		private static var canvas:MyCanvas;
 		
 		private var mainMenu:MyMainMenu;
 		
 		private var panel:MyPanel;
-		private var canvasT1:Canvas;
-		private var canvasT2:Canvas;
-		private var canvasT3:Canvas;
 		
 		private var gameCanvas:Canvas;
 		private var menuCanvas:Canvas;
-		    	
-		private static var basiclayout:MyBasicLayout;
 
+		private var radar:MyRadar;
 		private var tile:MyTile;
     	private var tile1:MyTile;
     	private var tile2:MyTile;
@@ -137,41 +134,16 @@
 			gameCanvas.setStyle("backgroundColor",0x00ff00);			
 			panel.rawChildren.addChild(gameCanvas);
 
-			
 			// Create menu Canvas
 			menuCanvas = new Canvas();
 			menuCanvas.x = 400;
-			menuCanvas.y = 80;
+			menuCanvas.y = 50;
 			menuCanvas.height = 400;
 			menuCanvas.width = 200;
 			menuCanvas.setStyle("backgroundColor",0x00ff00);			
 			panel.rawChildren.addChild(menuCanvas);
 			
-			canvasT1 = new Canvas();
-			canvasT1.x = 20;
-			canvasT1.y = 20;
-			canvasT1.height = 128;
-			canvasT1.width = 128;
-			canvasT1.setStyle("backgroundColor",0x000000);
-			menuCanvas.addChild(canvasT1);
-			
-			canvasT2 = new Canvas();
-			canvasT2.x = 20;
-			canvasT2.y = 120;
-			canvasT2.height = 128;
-			canvasT2.width = 128;
-			canvasT2.setStyle("backgroundColor",0x222222);
-			menuCanvas.addChild(canvasT2);
-			
-			canvasT3 = new Canvas();
-			canvasT3.x = 20;
-			canvasT3.y = 220;
-			canvasT3.height = 128;
-			canvasT3.width = 128;
-			canvasT3.setStyle("backgroundColor",0x444444);
-			menuCanvas.addChild(canvasT3);
-			
-			gameover = null;
+			//gameover = null;
 			
 			currentTimer = getTimer();
 			
@@ -233,6 +205,8 @@
 						
 						mainMenu.clear();
 						mainMenu = null;
+						
+						radar = new MyRadar(menuCanvas);
 
 						// Clear keyboard
 						keyboard.clear();
@@ -295,11 +269,12 @@
 		
 		private function moveZetrimino(elapsedTimer:int):void
 		{
-			zetri.paint_(gameCanvas);
-			
-			stack.getZetriminoAt(0).paint_(canvasT1);
-			stack.getZetriminoAt(1).paint_(canvasT2);
-			stack.getZetriminoAt(2).paint_(canvasT3);
+			zetri.paint(gameCanvas);
+
+			// Paint Zetriminos radar
+			stack.getZetriminoAt(0).paint_radar(radar.getTileCanvas(0));
+			stack.getZetriminoAt(1).paint_radar(radar.getTileCanvas(1));
+			stack.getZetriminoAt(2).paint_radar(radar.getTileCanvas(2));
 			
 			var done:Boolean = zetri.move(board, elapsedTimer, keyboard);
 			if (done)
@@ -330,7 +305,7 @@
 				zetri.setX(board.getSizeX() / 2 - 2);
 
 				// Delete the Zetrimino from the "next" panel
-				zetri.unpaint_(canvasT1);				
+				zetri.unpaint_radar(radar.getTileCanvas(0));				
 				
 				zetriStatus = ZETRI_STATUS_MOVING;
 				
@@ -338,9 +313,13 @@
 				{
 					// GAME OVER!
 					zetri.consolidate(board);
-					zetri.paint_(gameCanvas);
-					zetri.unpaint_(gameCanvas);
+					zetri.paint(gameCanvas);
+					zetri.unpaint(gameCanvas);
 					zetri = null;
+					
+					radar.clear();
+					radar = null;
+					
 					gameover = new GameOver();
 					appStatus = APP_STATUS_GAME_OVER;
 				}
@@ -360,7 +339,7 @@
 			if (zetriTimer >= 200 || true)
 			{
 				zetri.consolidate(board);
-				zetri.unpaint_(gameCanvas);
+				zetri.unpaint(gameCanvas);
 				zetri = null;
 				
 				board.checkCompleteLines();
@@ -374,19 +353,6 @@
 		{
 			myScore += score;	
 		}
-
-		public function onProgressStatus(e:ProgressEvent):void
-		{   
-		      // this is where progress will be monitored     
-		      //trace(e.bytesLoaded, e.bytesTotal); 
-		}
-		
-		public function onLoaderReady(e:Event):void
-		{     
-		      // the image is now loaded, so let's add it to the display tree!     
-		      MyApplication.canvas.rawChildren.addChild(myLoader);
-		}			
-		
 
         private function creationHandler(e:FlexEvent):void
         {

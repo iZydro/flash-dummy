@@ -20,10 +20,13 @@ package
 		private var shapeColor:int;
 		private var shapeType:int;
 		
+		// Array containing the sprites that form the Zetrimino
 		private var sprites:Array = new Array;
 
-		// Data related to the Zetrimino logic
+		// Array containing the sprites that form the Zetrimino radar
+		private var minisprites:Array = new Array;
 		
+		// Data related to the Zetrimino logic
 		private var posx:int, posy:int;
 		
 		// pos_faked_x is the x original coordinate after faking it to permit to rotate the Zetriminos near a wall
@@ -70,9 +73,14 @@ package
 					imgContainer1.y = y * MyApplication.ZT_TILES_SIZE + 50;
 					sprites.push(imgContainer1);
 					
-					// Add the Sprite to the board's current Tetrimino sprites list
-					board.addTile(imgContainer1);
-
+					imgContainer1 = new Sprite();
+					imgContainer1.graphics.beginFill(shapeColor);
+					imgContainer1.graphics.lineStyle(1,0x00ff00);
+					imgContainer1.graphics.drawRect(0, 0, MyApplication.ZT_MINITILES_SIZE, MyApplication.ZT_MINITILES_SIZE);
+					imgContainer1.graphics.endFill();
+					//imgContainer1.x = x * MyApplication.ZT_TILES_SIZE + 50;
+					//imgContainer1.y = y * MyApplication.ZT_TILES_SIZE + 50;
+					minisprites.push(imgContainer1);
 				}
 			}
 			
@@ -123,97 +131,76 @@ package
 		{
 			status = the_status;
 		}
+
+		// Unpaint Zetriino
 		
-		public function unpaint(panel:MyPanel):void
+		public function unpaint_radar(canvas:Canvas):void
 		{
-			for (var i:int = 0; i < sprites.length; i++)
-			{
-				if (panel.rawChildren.contains(sprites[i]))
-				{
-					var imgContainer1:Sprite = sprites[i];
-					panel.rawChildren.removeChild(imgContainer1);
-				}
-			}
+			do_unpaint(canvas, minisprites);
 		}
 		
-		public function unpaint_(canvas:Canvas):void
+		public function unpaint(canvas:Canvas):void
 		{
-			for (var i:int = 0; i < sprites.length; i++)
+			do_unpaint(canvas, sprites);
+		}
+		
+		public function do_unpaint(canvas:Canvas, the_sprites:Array):void
+		{
+			for (var i:int = 0; i < the_sprites.length; i++)
 			{
-				if (canvas.rawChildren.contains(sprites[i]))
+				if (canvas.rawChildren.contains(the_sprites[i]))
 				{
-					var imgContainer1:Sprite = sprites[i];
+					var imgContainer1:Sprite = the_sprites[i];
 					canvas.rawChildren.removeChild(imgContainer1);
 				}
 			}
 		}
 		
-		public function paint(panel:MyPanel):void
+		// Paint Zetrimino
+		
+		public function paint_radar(canvas:Canvas):void
 		{
-			for (var y:int = 0; y < shape.length; y++)
-			{
-				for (var x:int = 0; x < shape[y].length; x++)
-				{
-					var spr:Sprite = sprites[y*shape[y].length + x];
-
-					if ((posy+y) >= 0)
-					{
-						if (shape[y][x] == 1)
-						{
-							// Pieza
-							spr.x = (posx + x) * MyApplication.ZT_TILES_SIZE + 50;
-							spr.y = (posy + y) * MyApplication.ZT_TILES_SIZE + 50;
-	
-							if (!panel.rawChildren.contains(spr))
-							{
-								panel.rawChildren.addChild(spr);
-							}
-						}
-						else
-						{
-							// Blanco
-							if (panel.rawChildren.contains(spr))
-							{
-								panel.rawChildren.removeChild(spr);
-							}
-						}
-					}
-				}
-			}
+			do_paint(canvas, minisprites, MyApplication.ZT_MINITILES_SIZE);
 		}
 		
-		public function paint_(canvas:Canvas):void
+		public function paint(canvas:Canvas):void
+		{
+			do_paint(canvas, sprites, MyApplication.ZT_TILES_SIZE);
+		}
+
+		public function do_paint(the_canvas:Canvas, the_sprites:Array, the_size:int):void
 		{
 			for (var y:int = 0; y < shape.length; y++)
 			{
 				for (var x:int = 0; x < shape[y].length; x++)
 				{
-					var spr:Sprite = sprites[y*shape[y].length + x];
+					var spr:Sprite = the_sprites[y*shape[y].length + x];
 					
 					if ((posy+y) >= 0)
 					{
 						if (shape[y][x] == 1)
 						{
 							// Pieza
-							spr.x = (posx + x) * MyApplication.ZT_TILES_SIZE;
-							spr.y = (posy + y) * MyApplication.ZT_TILES_SIZE;
+							spr.x = (posx + x) * the_size;
+							spr.y = (posy + y) * the_size;
 							
-							if (!canvas.rawChildren.contains(spr))
+							if (!the_canvas.rawChildren.contains(spr))
 							{
-								canvas.rawChildren.addChild(spr);
+								the_canvas.rawChildren.addChild(spr);
 							}
 						}
 						else
 						{
 							// Blanco
-							if (canvas.rawChildren.contains(spr))
+							if (the_canvas.rawChildren.contains(spr))
 							{
-								canvas.rawChildren.removeChild(spr);
+								the_canvas.rawChildren.removeChild(spr);
 							}
 						}
 					}
 				}
 			}
+			
 		}
 		
 		public function move(board:MyBoard, elapsed:int, keyboard:MyKeyboard):Boolean

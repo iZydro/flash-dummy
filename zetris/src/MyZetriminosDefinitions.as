@@ -4,6 +4,7 @@ package
 	{
 		private var shapes:Array = new Array;
 		private var colors:Array = new Array;
+		private var offsets:Array = new Array;
 		
 		private var shape1:Array =
 			[
@@ -208,25 +209,25 @@ package
 		public function MyZetriminosDefinitions()
 		{
 			// 4 inv
-			shapes.push(shape1); colors.push(0x0000ff);
+			shapes.push(shape1); colors.push(0x0000ff); offsets.push(new MyZetriminosOffsets(shape1));
 			
 			// 4
-			shapes.push(shape2); colors.push(0xff0000);
+			shapes.push(shape2); colors.push(0xff0000); offsets.push(new MyZetriminosOffsets(shape2));
 			
 			// L inv
-			shapes.push(shape3); colors.push(0x0000ff);
+			shapes.push(shape3); colors.push(0x0000ff); offsets.push(new MyZetriminosOffsets(shape3));
 			
 			// L
-			shapes.push(shape4); colors.push(0xff0000);
+			shapes.push(shape4); colors.push(0xff0000); offsets.push(new MyZetriminosOffsets(shape4));
 			
 			// Square
-			shapes.push(shape5); colors.push(0xffff00);
+			shapes.push(shape5); colors.push(0xffff00); offsets.push(new MyZetriminosOffsets(shape5));
 			
 			// Long
-			shapes.push(shape6); colors.push(0x000080);
+			shapes.push(shape6); colors.push(0x000080); offsets.push(new MyZetriminosOffsets(shape6));
 			
 			// Tricornium
-			shapes.push(shape7); colors.push(0x8080ff);
+			shapes.push(shape7); colors.push(0x8080ff); offsets.push(new MyZetriminosOffsets(shape7));
 		}
 		
 		public function getZetriminosShapes():Array

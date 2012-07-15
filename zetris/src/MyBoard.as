@@ -83,7 +83,7 @@ package
 			return size_x;
 		}
 		
-		public function addTile(spr:Sprite):void
+		/*public function addTile(spr:Sprite):void
 		{
 			ztBoardTiles.push(spr);			
 		}
@@ -99,7 +99,7 @@ package
 				delete ztBoardTiles[0];
 				ztBoardTiles.splice(0, 1);				
 			}
-		}
+		}*/
 		
 		
 
@@ -132,10 +132,10 @@ package
 		
 		
 		
-		public function getNumTiles():int
+		/*public function getNumTiles():int
 		{
 			return ztBoardTiles.length;	
-		}
+		}*/
 
 		public function getZininoImageAt(y:int, x:int):MyZydroSprite
 		{
