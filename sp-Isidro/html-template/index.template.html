@@ -129,6 +129,18 @@ function myFBcall()
 		}
 		, requestCallback
 	);
+	
+	return "Androllo!";
+}
+
+function deleteRequest(requestId)
+{
+  FB.api(requestId, 'delete', function(response)
+	  {
+	    //alert(response);
+	    return response;
+	  }
+  );
 }
 
 function requestCallback(response)

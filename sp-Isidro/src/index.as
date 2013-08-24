@@ -2,12 +2,18 @@ package
 {
 	import com.facebook.graph.Facebook;
 	import com.facebook.graph.controls.Distractor;
+	import com.facebook.graph.data.FacebookAuthResponse;
 	
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
 	import flash.external.ExternalInterface;
 	import flash.net.URLVariables;
 	
+	import UI.Button;
+	
+	import facebook.ReceivedRequest;
+	
+	[SWF(width='760', height='800', backgroundColor='#ffff00', frameRate='30')]
 	public class index extends Sprite
 	{
 		public function index()
@@ -22,17 +28,7 @@ package
 				
 			ExternalInterface.addCallback("myFlashcall", myFlashcall);
 			
-			var search:String = ExternalInterface.call("window.location.href.toString");
-			search = search.substr(search.indexOf("?") + 1, search.length);
-			var vars:URLVariables = new URLVariables(search);
-			
-			for (var v:String in vars)
-			{
-				trace(v + " => " + vars[v]);
-				ExternalInterface.call("showtext", v + " => " + vars[v]);
-			}
-			
-			stage.addEventListener(MouseEvent.CLICK, onClick);
+			//stage.addEventListener(MouseEvent.CLICK, onClick);
 			
 			var ei:* = ExternalInterface.objectID;
 			
@@ -45,11 +41,36 @@ package
 			
 		}
 		
-		private function loginHandler(a:*, b:*):void
+		private function loginHandler(response:FacebookAuthResponse, extra:*):void
 		{
-			trace("Login Handler");
+			trace("Login Handler accessToken: " + response.accessToken);
+			
+			var search:String = ExternalInterface.call("window.location.href.toString");
+			search = search.substr(search.indexOf("?") + 1, search.length);
+			var vars:URLVariables = new URLVariables(search);
+			
+			var but_send:Button = new Button(64, 40);
+			but_send.setText("Request");
+			but_send.x = 0;
+			but_send.y = 0;
+			but_send.addEventListener(MouseEvent.CLICK, onClick);
+			addChild(but_send);
+			
+			for (var v:String in vars)
+			{
+				trace(v + " => " + vars[v]);
+				
+				if (v == "request_ids")
+				{
+					var requests_id_list:Array = vars[v].split(",");
+					for (var i:int = 0; i < requests_id_list.length; i++)
+					{
+						addChild(new ReceivedRequest(requests_id_list[i], response.uid, response.accessToken, i));
+					}
+				}
+			}
 		}
-		
+
 		private function myFlashcall(str:String):void
 		{
 			trace("myFlashcall: "+str);
